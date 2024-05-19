@@ -1,4 +1,5 @@
 desktop.ini
 secrets.txt
 
-directory_name/
+pc_venv/
+.idea/
