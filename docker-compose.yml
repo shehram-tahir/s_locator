@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./FrontEnd
+    ports:
+      - "9000:9000"
+    depends_on:
+      - middle_api
+    networks:
+      - myinternalnetwork
+
+  middle_api:
+    build:
+      context: ./my_middle_API
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./my_middle_API/Backend/storage:/app/Backend/storage
+    networks:
+      - myinternalnetwork
+
+networks:
+  myinternalnetwork:
