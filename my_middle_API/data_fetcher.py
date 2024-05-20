@@ -5,9 +5,9 @@ import asyncio
 
 async def fetch_data(location_req: LocationRequest, app_config):
     # Try to get data from storage
-    await asyncio.sleep(20)
     data = await get_data_from_storage(location_req, app_config)
     if not data:
+        await asyncio.sleep(20)
         # If data is not in storage, fetch from Google Maps API
         data = await fetch_from_google_maps_api(location_req, app_config)
         # Store the fetched data in storage

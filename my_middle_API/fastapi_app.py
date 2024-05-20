@@ -6,12 +6,15 @@ from config_factory import ConfigFactory
 from data_fetcher import fetch_data
 from data_types import ApiCommonConfig, LocationRequest, AcknowledgementResponse, DataResponse
 
+secrets_config = ConfigFactory.load_config('secret_settings.json', ApiCommonConfig)
+app_config = ConfigFactory.load_config('common_settings.json', ApiCommonConfig)
+app_config.api_key = secrets_config.api_key
+
+
 app = FastAPI()
 
 # Enable CORS
-origins = [
-    "http://localhost:9000",
-]
+origins = [app_config.enable_CORS_url]
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,7 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app_config = ConfigFactory.load_config('common_settings.json', ApiCommonConfig)
+
 
 class ConnectionManager:
     def __init__(self):
@@ -45,7 +48,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.post("/fetch-data")
+@app.post(app_config.request_acknowledge)
 async def fetch_location_data(location_req: LocationRequest = Body(..., description="""
 Send something like: 
 {
@@ -73,10 +76,8 @@ async def websocket_endpoint(websocket: WebSocket, request_id: str):
             data = await websocket.receive_text()
             location_req = LocationRequest.parse_raw(data)
 
-            # Process the request
             response_data = await fetch_data(location_req, app_config)
 
-            # Send the actual data response
             await manager.send_json({"data": response_data}, request_id)
     except WebSocketDisconnect:
         manager.disconnect(request_id)

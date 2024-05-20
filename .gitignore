@@ -1,6 +1,9 @@
 **/desktop.ini
 **/__pycache__
-secrets.txt
+**/secret*
 
 pc_venv/
 .idea/
+
+mykeys*
+ssh_config
