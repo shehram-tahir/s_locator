@@ -6,9 +6,13 @@ from config_factory import ConfigFactory
 from data_fetcher import fetch_data
 from data_types import ApiCommonConfig, LocationRequest, AcknowledgementResponse, DataResponse
 
-secrets_config = ConfigFactory.load_config('secret_settings.json', ApiCommonConfig)
+
 app_config = ConfigFactory.load_config('common_settings.json', ApiCommonConfig)
-app_config.api_key = secrets_config.api_key
+try:
+    secrets_config = ConfigFactory.load_config('secret_settings.json', ApiCommonConfig)
+    app_config.api_key = secrets_config.api_key
+except:
+    app_config.api_key = ""
 
 
 app = FastAPI()
