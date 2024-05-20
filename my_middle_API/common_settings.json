@@ -3,7 +3,7 @@
     "nearby_search": "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
     "place_details": "https://maps.googleapis.com/maps/api/place/details/json"
   },
-  "enable_CORS_url": "http://127.0.0.1:9000",
+  "enable_CORS_url": "http://localhost:9000",
   "request_acknowledge": "/fetch-data",
   "google_fields": "name,formatted_address,formatted_phone_number,opening_hours,website,user_ratings_total,business_status,rating,geometry,photos"
 }
