@@ -2,8 +2,8 @@ import axios from 'axios';
 
 
 let common_config = {
-    "fetch_data_url": "http://0.0.0.0:8000/fetch-data",
-    "websocket_url": "ws://0.0.0.0:8000/ws/"
+    "fetch_data_url": "http://127.0.0.1:8000/fetch-data",
+    "websocket_url": "ws://127.0.0.1:8000/ws/"
 };
 
 document.getElementById('send-button').addEventListener('click', async function () {
