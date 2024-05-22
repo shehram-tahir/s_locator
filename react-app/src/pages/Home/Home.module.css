@@ -1,0 +1,11 @@
+.content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .catalogueWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }

@@ -1,0 +1,36 @@
+.menu {
+  background-color: #f4f4f4;
+  border-right: 1px solid #ccc;
+  transition: width 0.3s;
+  overflow: hidden;
+  width: 60px;
+  position: relative;
+}
+
+.menu.expanded {
+  width: 200px;
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.menuItems, .iconItems {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.iconItems {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon {
+  margin: 10px 0;
+  font-size: 1.5em;
+}
