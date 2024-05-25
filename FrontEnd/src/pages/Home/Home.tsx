@@ -8,9 +8,10 @@ import {
   Catalog,
   fetchBusinesses,
 } from "../../services/apiService";
+import {createSearchParams, useLocation, useNavigate } from 'react-router-dom';
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoidWhhaWRlcjE0IiwiYSI6ImNsdHg5Y3F1MjAwa28ybG02a3AyajZoNnEifQ.Gz8HFmZK8UwXW3dTsSQ1Uw";
+
+mapboxgl.accessToken = process.env?.REACT_APP_MAPBOX_KEY ?? "";
 
 const HomeComponent = () => {
   
@@ -18,10 +19,12 @@ const HomeComponent = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const [cardData, setCardData] = useState<Catalog[]>([]);
+  const [cardData, setCardData] = useState<Catalog[]| undefined>(undefined);
   const [showModal, setShowModal] = useState(true);
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+
+  const navigate = useNavigate();
 
   const handleMoreInfo = (catalogLink: string) => {
     window.open(catalogLink, "_blank");
@@ -29,13 +32,15 @@ const HomeComponent = () => {
 
   useEffect(() => {
     const fetchCatalogData = async () => {
-      try {
-        const data = await getCatalog();
-        setCardData(data);
-      } catch (error: any) {
-        setError(error);
-      } finally {
-        setLoading(false);
+      if (!cardData) {
+        try {
+          const data = await getCatalog();
+          setCardData(data);
+        } catch (error: any) {
+          setError(error);
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
@@ -85,12 +90,15 @@ const HomeComponent = () => {
         container: 'map-container',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: businesses?.features[0]?.geometry?.coordinates,
-        zoom: 12,
+        minZoom: 7,
+        maxZoom: 16,
+        attributionControl: true,
+        zoom: 13,
       });
 
-      map.addControl(new mapboxgl.FullscreenControl());
-
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
       map.on('load', () => {
+      
         if (!!businesses?.features && businesses?.features?.length) {
           map.addSource('circle', {
             type: 'geojson',
@@ -101,8 +109,10 @@ const HomeComponent = () => {
             id: 'circle-layer',
             type: 'circle',
             source: 'circle',
+            minzoom: 7,
+            maxzoom: 16,
             paint: {
-              'circle-radius': 15,
+              'circle-radius': 13,
               'circle-color': '#12939A',
               'circle-opacity': 0.8,
               'circle-stroke-width': 0.4,
@@ -111,16 +121,17 @@ const HomeComponent = () => {
           });
         }
       });
+      return () => map.remove();
     }
   }, [businesses]);
 
   return (
     <div className={styles.content}>
-      <div id="map-container" style={{ width: "100%", height: "100vh" }} />;
+      <div id="map-container" style={{ width: "96%", height: "100vh", zIndex: 99 }} />;
       <Modal show={showModal} onClose={closeModal}>
         <h2 className={styles.catalogueHeading}>Add Data to Map</h2>
         <div className={styles.catalogueWrapper}>
-          {cardData.map((item) => (
+          {cardData?.map((item) => (
             <CatalogueCard
               key={item.id}
               id={item.id}

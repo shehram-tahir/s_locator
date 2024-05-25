@@ -52,12 +52,17 @@ export interface Catalog {
     records_number: number;
     catalog_link: string;
     can_access: boolean;
+    lat: number;
+    lng: number;
+    radius: number;
+    type: string;
 }
-let baseUrl = 'localhost:8000';
-let webSocketURL = `ws://${baseUrl}/ws/`;
+
+let baseUrl = process.env?.REACT_APP_API_URL ?? "";
+let webSocketURL = process.env?.REACT_APP_WEBSOCKET_URL ?? "";
 
 const apiClient: AxiosInstance = axios.create({
-    baseURL: `http://${baseUrl}`, // Replace with your API base URL
+    baseURL: baseUrl,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -153,6 +158,10 @@ export const getCatalog = async (): Promise<Catalog[]> => {
                         catalog_link:'https://example.com/catalog2.jpg',
                         records_number: 10,
                         can_access: true,
+                        lat: 22.4925,
+                          lng: 39.17757,
+                          radius: 5000,
+                          type: "grocery_or_supermarket",
                     },
                     {
                         id: '2',
@@ -162,6 +171,10 @@ export const getCatalog = async (): Promise<Catalog[]> => {
                         catalog_link:'https://example.com/catalog2.jpg',
                         records_number: 20,
                         can_access: false,
+                        lat: 22.4925,
+                          lng: 39.17757,
+                          radius: 5000,
+                          type: "grocery_or_supermarket",
                     },
                     {
                         id: "5218f0ef-c4db-4441-81e2-83ce413a9645",
@@ -173,6 +186,10 @@ export const getCatalog = async (): Promise<Catalog[]> => {
                         catalog_link:'https://catalog-assets.s3.ap-northeast-1.amazonaws.com/SAUgasStations.PNG',
                         records_number: 8517,
                         can_access: false,
+                        lat: 22.4925,
+                          lng: 39.17757,
+                          radius: 5000,
+                          type: "grocery_or_supermarket",
                     },
                     {
                         id: "3e5ee589-25e6-4cae-8aec-3ed3cdecef94",
@@ -184,6 +201,10 @@ export const getCatalog = async (): Promise<Catalog[]> => {
                           "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/sau_bak_res.PNG",
                         records_number: 132383,
                         can_access: true,
+                        lat: 22.4925,
+                          lng: 39.17757,
+                          radius: 5000,
+                          type: "grocery_or_supermarket",
                       },
                       {
                         id: "c4eb5d56-4fcf-4095-8037-4c84894fd014",
@@ -194,6 +215,10 @@ export const getCatalog = async (): Promise<Catalog[]> => {
                           catalog_link: "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/real_estate_ksa.png",
                         records_number: 179141,
                         can_access: false,
+                          lat: 22.4925,
+                          lng: 39.17757,
+                          radius: 5000,
+                          type: "grocery_or_supermarket",
                       },
                 ]);
             }, 2000);
