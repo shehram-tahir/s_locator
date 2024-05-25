@@ -1,30 +1,20 @@
-# Use an official Node runtime as a parent image
+# Use an official Node.js image as the base image
 FROM node:16
 
-# Set the working directory in the container
+# Set the working directory to /app
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy the package.json file
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the current directory contents into the container
+# Copy the rest of the code
 COPY . .
 
-# Expose port 9000
-EXPOSE 9000
+# Expose the port
+EXPOSE 3000
 
-# # Prod
-# # Build the app
-# RUN npm run build
-# # Install http-server to serve the static files
-# RUN npm install -g http-server
-# CMD ["http-server", "dist", "-p", "9000"]
-
-# Dev
-# # Install dependencies
-RUN npm install
-# Serve the static files
+# Run the command to start the development server
 CMD ["npm", "start"]
