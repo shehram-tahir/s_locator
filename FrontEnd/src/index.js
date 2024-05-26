@@ -3,7 +3,10 @@ import axios from 'axios';
 
 let common_config = {
     "fetch_data_url": "http://localhost:8000/fetch-data",
-    "websocket_url": "ws://localhost:8000/ws/"
+    "metadata_url": "http://localhost:8000/get_catalogue_metadata",
+    "data_load_url": "http://localhost:8000/request_dataset_load",
+    "websocket_url": "ws://localhost:8000/ws/",
+    "websocket_load_url": "ws://localhost:8000/ws_dataset_load/"
 };
 
 document.getElementById('send-button').addEventListener('click', async function () {
