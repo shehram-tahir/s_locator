@@ -1,5 +1,4 @@
-{
-	"data": [
+[
 		{
 			"business_status": "OPERATIONAL",
 			"formatted_address": "151 Av. Laurier O, Montréal, QC H2T 2N6, Canada",
@@ -669,4 +668,3 @@
 			}
 		}
 	]
-}
