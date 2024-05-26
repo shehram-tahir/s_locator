@@ -44,13 +44,19 @@ def get_filename(location_req: LocationRequest):
     return f"{STORAGE_DIR}/data_{lat}_{lng}_{radius}_{place_type}.json"
 
 
-async def get_data_from_storage(location_req: LocationRequest, app_config):
+async def get_data_from_storage(location_req: LocationRequest):
     filename = get_filename(location_req)
     if os.path.exists(filename):
         with open(filename, 'r') as file:
             return json.load(file)
     return None
 
+async def get_dataset_from_storage(dataset_id:str):
+    filename = f"{STORAGE_DIR}/catalogue_data_{dataset_id}.json"
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            return json.load(file)
+    return None
 
 async def store_data(location_req: LocationRequest, data, app_config):
     filename = get_filename(location_req)

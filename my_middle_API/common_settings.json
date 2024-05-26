@@ -4,6 +4,8 @@
     "place_details": "https://maps.googleapis.com/maps/api/place/details/json"
   },
   "enable_CORS_url": "http://localhost:3000",
+  "get_catalogue_metadata":"/get_catalogue_metadata",
+  "request_dataset_load":"/request_dataset_load",
   "request_acknowledge": "/fetch-data",
   "google_fields": "name,formatted_address,formatted_phone_number,opening_hours,website,user_ratings_total,business_status,rating,geometry,photos"
 }

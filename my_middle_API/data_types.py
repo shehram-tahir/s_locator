@@ -7,6 +7,10 @@ class LocationRequest(BaseModel):
     radius: int
     type: str
 
+
+class CatalogueDataset(BaseModel):
+    catalogue_dataset_id: str
+    
 @dataclass
 class ApiCommonConfig:
     api_key: str
@@ -31,3 +35,14 @@ class AcknowledgementResponse(BaseModel):
 
 class DataResponse(BaseModel):
     data: dict
+
+class FetchLocationDataResponse(BaseModel):
+    business_status: str
+    formatted_address: str
+    formatted_phone_number: str
+    geometry: dict
+    name: str
+    opening_hours: dict
+    photos: list
+    rating: float
+    user_ratings_total: int
