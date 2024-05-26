@@ -57,11 +57,7 @@ const HomeComponent = () => {
 
   useEffect(() => {
     const catalog = {
-      id: query.get("id"),
-      lat: query.get("lat"),
-      lng: query.get("lng"),
-      radius: query.get("radius"),
-      type: query.get("type"),
+      catalogue_dataset_id: query.get("catalogue_dataset_id"),
     };
     localStorage.setItem("catalog", JSON.stringify(catalog));
     fetchBusinessData();
@@ -69,11 +65,7 @@ const HomeComponent = () => {
 
   const handleMoreInfo = (catalog: Catalog) => {
     let params = createQueryString({
-      id: catalog.id,
-      lat: catalog.lat,
-      lng: catalog.lng,
-      radius: catalog.radius,
-      type: catalog.type,
+      catalogue_dataset_id: catalog.id,
     });
     setSearchParams(params);
     closeModal();
@@ -83,7 +75,7 @@ const HomeComponent = () => {
     try {
       const obj = JSON.parse(localStorage?.getItem("catalog") ?? "{}");
 
-      if (!businesses && obj.lat && obj.lng && obj.radius && obj.type) {
+      if (!businesses && obj.catalogue_dataset_id) {
         const data1 = await fetchBusinesses(obj);
         let formatedData: any = {
           type: "FeatureCollection",
