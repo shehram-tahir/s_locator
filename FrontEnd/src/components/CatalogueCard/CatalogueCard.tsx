@@ -46,7 +46,7 @@ const CatalogueCard: React.FC<CatalogueCardProps> = ({
         <ul className={styles.cardActions}>
           <li className={styles.actionItem}>
             <div onClick={onMoreInfo} className={styles.moreInfo}>
-              More Info
+              Load Data
             </div>
             <span
               role="img"

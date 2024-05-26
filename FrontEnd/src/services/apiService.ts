@@ -99,21 +99,17 @@ export const fetchBusinesses = async (jsonData: {
 
         const response = await apiClient.post('/fetch-data', jsonData);
         
-        console.log('HTTP response received:', response.data);
 
         const requestId = response.data.request_id;
-        console.log('returned request ID= ', requestId)
-
+        
         const websocket = new WebSocket(`${webSocketURL}${requestId}`);
 
         return new Promise<Business[]>((resolve, reject) => {
             websocket.onopen = function () {
-                console.log('WebSocket connection opened');
                 websocket.send(JSON.stringify(jsonData));
             };
 
             websocket.onmessage = function (event) {
-                console.log('Message received from server:', event.data);
                 const res = JSON.parse(event.data);
                 websocket.close();
                 resolve(res.data);  // Resolve the promise with the received data
@@ -221,7 +217,7 @@ export const getCatalog = async (): Promise<Catalog[]> => {
                           type: "grocery_or_supermarket",
                       },
                 ]);
-            }, 2000);
+            }, 1000);
         });
         
     } catch (error) {

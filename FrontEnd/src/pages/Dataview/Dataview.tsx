@@ -112,15 +112,11 @@ const Dataview: React.FC = () => {
 
   
   useEffect(() => {
-   
+    
     const fetchBusinessData = async () => {
       try {
-        const data = await fetchBusinesses({
-          lat: 22.4925,
-          lng: 39.17757,
-          radius: 5000,
-          type: "grocery_or_supermarket",
-        });
+        const obj = JSON.parse(localStorage?.getItem('catalog')?? '{}');
+        const data = await fetchBusinesses(obj);
         setBusinesses(data);
       } catch (error: any) {
         setError(error);
