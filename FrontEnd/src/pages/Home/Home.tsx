@@ -14,7 +14,9 @@ import {
 import mapboxgl from "mapbox-gl";
 
 mapboxgl.accessToken = process.env?.REACT_APP_MAPBOX_KEY ?? "";
-
+mapboxgl.setRTLTextPlugin(
+  'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',()=>{}
+);
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
@@ -129,8 +131,6 @@ const HomeComponent = () => {
       center: businesses?.features[0]?.geometry?.coordinates ?? [
         39.6074258, 24.4738121,
       ],
-      minZoom: 7,
-      maxZoom: 16,
       attributionControl: true,
       zoom: 13,
     });
@@ -149,8 +149,6 @@ const HomeComponent = () => {
             id: "circle-layer",
             type: "circle",
             source: "circle",
-            minzoom: 7,
-            maxzoom: 16,
             paint: {
               "circle-radius": 13,
               "circle-color": "#12939A",
