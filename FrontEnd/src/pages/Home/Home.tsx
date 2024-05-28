@@ -90,8 +90,8 @@ const HomeComponent = () => {
             geometry: {
               type: "Point",
               coordinates: [
-                x.geometry?.location?.lat,
                 x.geometry?.location?.lng,
+                x.geometry?.location?.lat
               ],
             },
           });

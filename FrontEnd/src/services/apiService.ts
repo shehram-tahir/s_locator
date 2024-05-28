@@ -78,62 +78,12 @@ const apiClient: AxiosInstance = axios.create({
 //   }
 // );
 
-export const getBusinessDetails = async (id: string): Promise<Business> => {
-    try {
-        const response = await apiClient.get(`/business/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching business details:', error);
-        throw error;
-    }
-};
-
 export const fetchBusinesses = async (jsonData: {
-        catalogue_dataset_id:string;
-    } | undefined): Promise<Business[]> => {
-    try {
-
-        const response = await apiClient.post('/request_dataset_load', jsonData);
-
-        const requestId = response.data.request_id;
-        
-        const websocket = new WebSocket(`${webSocketURL}${requestId}`);
-
-        return new Promise<Business[]>((resolve, reject) => {
-            websocket.onopen = function () {
-                websocket.send(JSON.stringify(jsonData));
-            };
-
-            websocket.onmessage = function (event) {
-                const res = JSON.parse(event.data);
-                websocket.close();
-                resolve(res.data);  // Resolve the promise with the received data
-            };
-
-            websocket.onerror = function (error) {
-                websocket.close();
-                console.error('WebSocket error:', error);
-                reject(error);  // Reject the promise on error
-            };
-
-            websocket.onclose = function () {
-                console.log('WebSocket connection closed');
-            };
-        });
-
-    } catch (error) {
-        console.error('Error fetching businesses:', error);
-        throw error;
-    }
-};
-
-export const fetchBusinessesOld = async (jsonData: {
-    lat: number; lng: number; radius: number; type: string;
+    catalogue_dataset_id: string;
 } | undefined): Promise<Business[]> => {
     try {
 
-        const response = await apiClient.post('/fetch-data', jsonData);
-
+        const response = await apiClient.post(process.env?.REACT_APP_LOAD_DATASET ?? "", jsonData);
 
         const requestId = response.data.request_id;
 
@@ -146,7 +96,7 @@ export const fetchBusinessesOld = async (jsonData: {
 
             websocket.onmessage = function (event) {
                 const res = JSON.parse(event.data);
-                websocket.close();
+                // websocket.close();
                 resolve(res.data);  // Resolve the promise with the received data
             };
 
@@ -169,9 +119,9 @@ export const fetchBusinessesOld = async (jsonData: {
 
 export const getCatalog = async (): Promise<Catalog[]> => {
     try {
-        const response = await apiClient.get('/get_catalogue_metadata');
+        const response = await apiClient.get(process.env?.REACT_APP_CATALOG_METADATA ?? "");
         return response.data;
-        
+
     } catch (error) {
         console.error('Error fetching Catalog:', error);
         throw error;
