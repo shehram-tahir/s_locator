@@ -19,7 +19,7 @@ const ImageRenderer: React.FC<{ value: Photo[] }> = ({ value }) => {
         data-for="imageTooltip"
       >
         <FaImages />
-        <span>{value.length}</span>
+        <span>{value?.length}</span>
       </button>
       {showTooltip && (
         <Tooltip id="imageTooltip" place="top">
@@ -30,7 +30,7 @@ const ImageRenderer: React.FC<{ value: Photo[] }> = ({ value }) => {
               gap: "10px",
             }}
           >
-            {value.map((photo, index) => (
+            {value?.map((photo, index) => (
               <img
                 key={index}
                 src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=YOUR_API_KEY`}
