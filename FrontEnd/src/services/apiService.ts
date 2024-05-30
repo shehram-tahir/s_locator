@@ -87,7 +87,7 @@ export const fetchBusinesses = async (jsonData: {
 
         const requestId = response.data.request_id;
 
-        const websocket = new WebSocket(`${webSocketURL}${requestId}`);
+        const websocket = new WebSocket(`${baseUrl}${webSocketURL}${requestId}`);
 
         return new Promise<Business[]>((resolve, reject) => {
             websocket.onopen = function () {
