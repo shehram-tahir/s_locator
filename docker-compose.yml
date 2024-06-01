@@ -3,16 +3,13 @@ services:
   frontend:
     build:
       context: ./FrontEnd
-    container_name: frontend
     ports:
-      - "80:80"
-      - "443:443"
+      - "3000:3000"
     depends_on:
       - middle_api
     networks:
       - myinternalnetwork
-
-      
+    
   middle_api:
     build:
       context: ./my_middle_API
@@ -23,17 +20,18 @@ services:
     networks:
       - myinternalnetwork
 
-  # nginx:
-  #   build:
-  #     context: ./Nginx  # Directory containing the Dockerfile and configuration files
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   depends_on:
-  #     - frontend
-  #     - middle_api
-  #   networks:
-  #     - myinternalnetwork
+  nginx:
+    container_name: rvrs_prxy
+    build:
+      context: ./Nginx  # Directory containing the Dockerfile and configuration files
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - middle_api
+    networks:
+      - myinternalnetwork
 
 networks:
   myinternalnetwork:

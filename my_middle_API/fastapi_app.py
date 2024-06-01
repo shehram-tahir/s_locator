@@ -7,18 +7,18 @@ from data_fetcher import fetch_data, get_catalogue_dataset
 from data_types import ApiCommonConfig, LocationRequest, AcknowledgementResponse, DataResponse, CatalogueDataset, FetchLocationDataResponse
 
 
-app_config = ConfigFactory.load_config('common_settings.json', ApiCommonConfig)
+urls = ConfigFactory.load_config('common_settings.json', ApiCommonConfig)
 try:
     secrets_config = ConfigFactory.load_config('secret_settings.json', ApiCommonConfig)
-    app_config.api_key = secrets_config.api_key
+    urls.api_key = secrets_config.api_key
 except:
-    app_config.api_key = ""
+    urls.api_key = ""
 
 
 app = FastAPI()
 
 # Enable CORS
-origins = [app_config.enable_CORS_url]
+origins = [urls.enable_CORS_url]
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,7 +53,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.get(app_config.get_catalogue_metadata)
+@app.get(urls.catalog_metadata)
 async def get_metadata():
     metadata = [
         {
@@ -117,7 +117,7 @@ async def get_metadata():
     
     return metadata
 
-@app.post(app_config.request_dataset_load)
+@app.post(urls.reqst_dataset)
 async def request_ctalogue_dataset_load(catalogue_dataset_id: CatalogueDataset = Body(...)):
     try:
         # Validate the incoming JSON request body
@@ -130,7 +130,7 @@ async def request_ctalogue_dataset_load(catalogue_dataset_id: CatalogueDataset =
     return AcknowledgementResponse(message="Data load request received and is being processed", request_id=request_id)
 
 
-@app.websocket("/ws_dataset_load/{request_id}")
+@app.websocket(urls.dataset_ws)
 async def websocket_endpoint(websocket: WebSocket, request_id: str):
     await manager.connect(websocket, request_id)
     try:
@@ -146,7 +146,7 @@ async def websocket_endpoint(websocket: WebSocket, request_id: str):
         print(f"WebSocket disconnected: {request_id}")
 
 
-@app.post(app_config.request_acknowledge)
+@app.post(urls.request_acknowledge)
 async def fetch_location_data(location_req: LocationRequest = Body(..., description="""
 Send something like: 
 {
@@ -166,7 +166,7 @@ Send something like:
     # Acknowledge the request
     return AcknowledgementResponse(message="Request received and is being processed", request_id=request_id)
 
-@app.websocket("/ws/{request_id}")
+@app.websocket(urls.point_ws)
 async def websocket_endpoint(websocket: WebSocket, request_id: str):
     await manager.connect(websocket, request_id)
     try:
@@ -174,7 +174,7 @@ async def websocket_endpoint(websocket: WebSocket, request_id: str):
             data = await websocket.receive_text()
             location_req = LocationRequest.parse_raw(data)
 
-            response_data = await fetch_data(location_req, app_config)
+            response_data = await fetch_data(location_req, urls)
 
             await manager.send_json({"data": response_data}, request_id)
     except WebSocketDisconnect:
