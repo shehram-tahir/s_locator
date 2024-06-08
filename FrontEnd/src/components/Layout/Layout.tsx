@@ -4,15 +4,12 @@ import styles from './Layout.module.css';
 import ExpandableMenu from '../ExpandableMenu/ExpandableMenu';
 import Home from '../../pages/Home/Home';
 import About from '../../pages/About/About';
-import { MdInfo, MdMap, MdTableChart, MdFactory } from 'react-icons/md';
-import Dataview from '../../pages/Dataview/DataviewPage';
-import ProducerView from '../../pages/ProducerView/ProducerView';
-
+import { MdInfo, MdMap, MdTableChart } from 'react-icons/md';
+import Dataview from '../../pages/Dataview/Dataview';
 
 interface LayoutProps {
   children?: ReactNode;
 }
-
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
@@ -43,12 +40,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {isMenuExpanded && <span> About</span>}
             </Link>
           </li>
-          <li>
-            <Link to="/producerView">
-              <MdFactory className={styles.icon} />
-              {isMenuExpanded && <span> producer view</span>}
-            </Link>
-          </li>
           
         </ul>
       </ExpandableMenu>
@@ -57,7 +48,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Route path="/" element={<Home />} />
           <Route path="/tabularView" element={<Dataview />} />
           <Route path="/about" element={<About />} />
-          <Route path="/producerView" element={<ProducerView />} />
         </Routes>
         {children}
       </div>
