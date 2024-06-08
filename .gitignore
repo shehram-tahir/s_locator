@@ -4,6 +4,7 @@
 
 pc_venv/
 .idea/
+/.vscode/
 
 mykeys*
 ssh_config
