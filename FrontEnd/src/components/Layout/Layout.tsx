@@ -4,9 +4,10 @@ import styles from './Layout.module.css';
 import ExpandableMenu from '../ExpandableMenu/ExpandableMenu';
 import Home from '../../pages/Home/Home';
 import About from '../../pages/About/About';
-import ProducerView from '../../pages/ProducerView/ProducerView';
 import { MdInfo, MdMap, MdTableChart, MdFactory } from 'react-icons/md';
 import Dataview from '../../pages/Dataview/DataviewPage';
+import ProducerView from '../../pages/ProducerView/ProducerView';
+
 
 interface LayoutProps {
   children?: ReactNode;

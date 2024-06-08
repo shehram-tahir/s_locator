@@ -1,0 +1,6 @@
+/* ProducerView.module.css */
+.producerView {
+    position: relative;
+    padding-top: 60px; /* Ensure there's enough space at the top for the search box */
+  }
+  
