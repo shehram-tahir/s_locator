@@ -1,0 +1,6 @@
+{
+    "REACT_APP_API_URL": "http://localhost:8000/fastapi",
+    "REACT_APP_CATALOG_METADATA": "/get_catalogue_metadata",
+    "REACT_APP_LOAD_DATASET": "/request_dataset_load",
+    "REACT_APP_WEBSOCKET_URL": "/ws_dataset_load/"
+}

@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import urls from '../../urls.json';
 
 export interface CreateBusinessData {
     name: string;
@@ -54,8 +55,8 @@ export interface Catalog {
     can_access: boolean;
 }
 
-let baseUrl = process.env?.REACT_APP_API_URL ?? "";
-let webSocketURL = process.env?.REACT_APP_WEBSOCKET_URL ?? "";
+let baseUrl = urls.REACT_APP_API_URL
+let webSocketURL = urls.REACT_APP_WEBSOCKET_URL
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: baseUrl,
@@ -83,7 +84,7 @@ export const fetchBusinesses = async (jsonData: {
 } | undefined): Promise<Business[]> => {
     try {
 
-        const response = await apiClient.post(process.env?.REACT_APP_LOAD_DATASET ?? "", jsonData);
+        const response = await apiClient.post(urls.REACT_APP_LOAD_DATASET, jsonData);
 
         const requestId = response.data.request_id;
 
@@ -119,7 +120,7 @@ export const fetchBusinesses = async (jsonData: {
 
 export const getCatalog = async (): Promise<Catalog[]> => {
     try {
-        const response = await apiClient.get(process.env?.REACT_APP_CATALOG_METADATA ?? "");
+        const response = await apiClient.get(urls.REACT_APP_CATALOG_METADATA);
         return response.data;
 
     } catch (error) {
