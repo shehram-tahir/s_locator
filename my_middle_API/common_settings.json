@@ -4,7 +4,7 @@
     "place_details": "https://maps.googleapis.com/maps/api/place/details/json"
   },
   "enable_CORS_url": "http://localhost:3000",
-  "catalog_metadata":"/fastapi/get_catalogue_metadata",
+  "catalog_metadata":"/fastapi/get_all_catalogues_metadata",
   "reqst_dataset":"/fastapi/request_dataset_load",
   "request_acknowledge": "/fastapi/fetch-data",
   "dataset_ws":"/fastapi/ws_dataset_load/{request_id}",

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useData } from '../../context/AppDataContext';
 import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
@@ -57,76 +58,42 @@ const OpeningHoursRenderer: React.FC<{ value: OpeningHours }> = ({ value }) => {
 
 const Dataview: React.FC = () => {
   const [rowData, setRowData] = useState();
+  const businessData = useData('businessData');
+
+  if (!businessData) return <div>Loading...</div>;
 
   const [businesses, setBusinesses] = useState<Business[]>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
-    { headerName: "Name", field: "name", sortable: true, filter: true },
-    {
-      headerName: "Address",
-      field: "formatted_address",
-      sortable: true,
-      filter: true,
-    },
-    {
-      headerName: "Phone Number",
-      field: "formatted_phone_number",
-      sortable: true,
-      filter: true,
-    },
-    {
-      headerName: "Images",
-      field: "photos",
-      cellRenderer: ImageRenderer,
-      cellRendererParams: {
-        photos: "photos",
-      },
-    },
-    {
-      headerName: "Opening Hours",
-      field: "opening_hours",
-      cellRenderer: OpeningHoursRenderer,
-      cellRendererParams: {
-        opening_hours: "opening_hours",
-      },
-    },
-    {
-      headerName: "Website",
-      field: "website",
-      sortable: true,
-      filter: true,
-    },
-    {
-      headerName: "Rating",
-      field: "rating",
-      sortable: true,
-    },
-    {
-      headerName: "Total Rating",
-      field: "user_ratings_total",
-      sortable: true,
-    },
+    {headerName: "Name", field: "name", sortable: true, filter: true },
+    {headerName: "Address",field: "formatted_address",sortable: true,filter: true,    },
+    {headerName: "Phone Number",field: "formatted_phone_number",sortable: true,filter: true,},
+    {headerName: "Images",field: "photos",cellRenderer: ImageRenderer,cellRendererParams: {  photos: "photos",},},
+    {headerName: "Opening Hours",field: "opening_hours",cellRenderer: OpeningHoursRenderer,cellRendererParams: {  opening_hours: "opening_hours",},},
+    {headerName: "Website",field: "website",sortable: true,filter: true,},
+    {headerName: "Rating",field: "rating",sortable: true,},
+    {headerName: "Total Rating",field: "user_ratings_total",sortable: true,},
   ]);
 
   
-  useEffect(() => {
+  // useEffect(() => {
     
-    const fetchBusinessData = async () => {
-      try {
-        const obj = JSON.parse(localStorage?.getItem('catalog')?? '{}');
-        const data = await fetchBusinesses(obj);
-        setBusinesses(data);
-      } catch (error: any) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //   const fetchBusinessData = async () => {
+  //     try {
+  //       const obj = JSON.parse(localStorage?.getItem('catalog')?? '{}');
+  //       const data = await fetchBusinesses(obj);
+  //       setBusinesses(data);
+  //     } catch (error: any) {
+  //       setError(error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchBusinessData();
-  }, []);
+  //   fetchBusinessData();
+  // }, []);
 
   return (
     <div
@@ -135,7 +102,7 @@ const Dataview: React.FC = () => {
     >
       <AgGridReact
         columnDefs={columnDefs}
-        rowData={businesses}
+        rowData={businessData}
         pagination={true}
         paginationPageSize={10}
         paginationPageSizeSelector={[10, 25, 50]}

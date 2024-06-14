@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useData, useSetData } from '../../context/AppDataContext';
 import CatalogueCard from "../../components/CatalogueCard/CatalogueCard";
 import styles from "./Home.module.css";
 import Modal from "../../components/Modal/Modal";
@@ -79,6 +80,7 @@ const HomeComponent = () => {
 
       if (!businesses && obj.catalogue_dataset_id) {
         const data1 = await fetchBusinesses(obj);
+        useSetData('businessData')(data1);
         let formatedData: any = {
           type: "FeatureCollection",
           features: [],

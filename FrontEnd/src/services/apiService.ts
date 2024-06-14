@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import urls from '../../urls.json';
+import urls from '../urls.json';
 
 export interface CreateBusinessData {
     name: string;
@@ -113,18 +113,18 @@ export const fetchBusinesses = async (jsonData: {
         });
 
     } catch (error) {
-        console.error('Error fetching businesses:', error);
+        console.error('Error catalog full dataset:', error);
         throw error;
     }
 };
 
 export const getCatalog = async (): Promise<Catalog[]> => {
     try {
-        const response = await apiClient.get(urls.REACT_APP_CATALOG_METADATA);
+        const response = await apiClient.get(urls.ALL_CATALOGS_METADATA);
         return response.data;
 
     } catch (error) {
-        console.error('Error fetching Catalog:', error);
+        console.error('Error fetching all Catalogs metadata:', error);
         throw error;
     }
 };
