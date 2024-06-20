@@ -145,9 +145,6 @@ async def http_2():
     return response
 
 
-# replace below with just fetch_acknowlg_id again
-# @app.post(urls.fetch_data, response_model=AcknowledgementResponse)
-
 
 @app.get(urls.catlog_collection, response_model=restype_all_catlogs)
 async def http_1():
