@@ -1,6 +1,6 @@
 import requests
 
-from data_types import LocationRequest
+from all_types.myapi_dtypes import LocationRequest
 
 
 async def fetch_from_google_maps_api(location_req: LocationRequest, app_config):

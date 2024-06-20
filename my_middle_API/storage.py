@@ -33,7 +33,7 @@
 import json
 import os
 
-from data_types import LocationRequest
+from all_types.myapi_dtypes import LocationRequest
 
 STORAGE_DIR = 'Backend/storage'
 os.makedirs(STORAGE_DIR, exist_ok=True)

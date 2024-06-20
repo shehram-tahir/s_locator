@@ -1,17 +1,20 @@
 import React, { ReactNode, useState } from 'react';
 import { Link, Routes, Route } from 'react-router-dom';
-import styles from './Layout.module.css';
+import styles from './VertiSideBar.module.css';
 import ExpandableMenu from '../ExpandableMenu/ExpandableMenu';
 import Home from '../../pages/Home/Home';
 import About from '../../pages/About/About';
 import { MdInfo, MdMap, MdTableChart } from 'react-icons/md';
 import Dataview from '../../pages/Dataview/Dataview';
 
+
 interface LayoutProps {
   children?: ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+
+
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 
   const toggleMenu = () => {

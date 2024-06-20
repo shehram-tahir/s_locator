@@ -2,14 +2,23 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
 import uuid
+from all_types.config_dtypes import ApiCommonConfig
+from mapbox_connector import get_boxmap_catlog_data
 from config_factory import ConfigFactory
-from data_fetcher import fetch_data, get_catalogue_dataset
-from data_types import ApiCommonConfig, LocationRequest, AcknowledgementResponse, DataResponse, CatalogueDataset, FetchLocationDataResponse
+from data_fetcher import fetch_data, fetch_catlog_collection
+from all_types.myapi_dtypes import (
+    LocationRequest,
+    CatlogId,
+    restype_all_catlogs,
+    restype_fetch_acknowlg_id,
+)
+from all_types.boxmap_dtype import CatlogData
+from typing import Type, Callable, Awaitable, Any, Optional
 
 
-urls = ConfigFactory.load_config('common_settings.json', ApiCommonConfig)
+urls = ConfigFactory.load_config("common_settings.json", ApiCommonConfig)
 try:
-    secrets_config = ConfigFactory.load_config('secret_settings.json', ApiCommonConfig)
+    secrets_config = ConfigFactory.load_config("secret_settings.json", ApiCommonConfig)
     urls.api_key = secrets_config.api_key
 except:
     urls.api_key = ""
@@ -27,7 +36,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 class ConnectionManager:
@@ -50,133 +58,103 @@ class ConnectionManager:
         if request_id in self.active_connections:
             await self.active_connections[request_id].send_json(data)
 
+
 manager = ConnectionManager()
 
 
-@app.get(urls.catalog_metadata)
-async def get_metadata():
-    metadata = [
-        {
-            "id": "1",
-            "name": "Saudi Arabia - gas stations poi data",
-            "description": "Database of all Saudi Arabia gas stations Points of Interests",
-            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/real_estate_ksa.png",
-            "catalog_link": "https://example.com/catalog2.jpg",
-            "records_number": 10,
-            "can_access": True,
-        },
-        {
-            "id": "2",
-            "name": "Saudi Arabia - Real Estate Transactions",
-            "description": "Database of real-estate transactions in Saudi Arabia",
-            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/real_estate_ksa.png",
-            "catalog_link": "https://example.com/catalog2.jpg",
-            "records_number": 20,
-            "can_access": False,
-        },
-        {
-            "id": "5218f0ef-c4db-4441-81e2-83ce413a9645",
-            "name": "Saudi Arabia - gas stations poi data",
-            "description": "Database of all Saudi Arabia gas stations Points of Interests",
-            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/SAUgasStations.PNG",
-            "catalog_link": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/SAUgasStations.PNG",
-            "records_number": 8517,
-            "can_access": False,
-        },
-        {
-            "id": "3e5ee589-25e6-4cae-8aec-3ed3cdecef94",
-            "name": "Saudi Arabia - Restaurants, Cafes and Bakeries",
-            "description": "Focusing on the restaurants, cafes and bakeries in KSA",
-            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/sau_bak_res.PNG",
-            "catalog_link": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/sau_bak_res.PNG",
-            "records_number": 132383,
-            "can_access": True,
-        },
-        {
-            "id": "c4eb5d56-4fcf-4095-8037-4c84894fd014",
-            "name": "Saudi Arabia - Real Estate Transactions",
-            "description": "Database of real-estate transactions in Saudi Arabia",
-            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/real_estate_ksa.png",
-            "catalog_link": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/real_estate_ksa.png",
-            "records_number": 179141,
-            "can_access": False,
-        },
-    ]
-    
-    # Add 20 more dummy entries
-    for i in range(3, 23):
-        metadata.append({
-            "id": str(i),
-            "name": f"Saudi Arabia - Sample Data {i}",
-            "description": f"Sample description for dataset {i}",
-            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/sample_image.png",
-            "catalog_link": "https://example.com/sample_image.jpg",
-            "records_number": i * 100,
-            "can_access": i % 2 == 0,
-        })
-    
-    return metadata
-
-@app.post(urls.reqst_dataset)
-async def request_ctalogue_dataset_load(catalogue_dataset_id: CatalogueDataset = Body(...)):
+async def ws_handling(
+    websocket: WebSocket,
+    request_id: str,
+    input_type: Type[BaseModel],
+    output_type: Type[BaseModel],
+    custom_function: Callable[[Any], Awaitable[Any]],
+):
+    await manager.connect(websocket, request_id)
     try:
-        # Validate the incoming JSON request body
-        catalogue_dataset_id = CatalogueDataset(**catalogue_dataset_id.dict())
-    except ValidationError as e:
-        raise HTTPException(status_code=400, detail="Invalid request body")
+        while True:
+            req = await websocket.receive_text()
+            parsed_req = input_type.model_validate_json(req)
+            response = await custom_function(parsed_req)
+            try:
+                validated_output = output_type.model_validate(response)
+                await manager.send_json(
+                    {"data": validated_output.model_dump()}, request_id
+                )
+            except ValidationError as e:
+                error_message = f"Output data validation failed: {str(e)}"
+                await manager.send_json({"error": error_message}, request_id)
+    except WebSocketDisconnect:
+        manager.disconnect(request_id)
+        print(f"WebSocket disconnected: {request_id}")
+
+
+async def http_handling(
+    req: Optional[BaseModel],
+    input_type: BaseModel,
+    output_type: BaseModel,
+    custom_function: Callable[[BaseModel], Any],
+):
+    output = ""
+
+    if req is not None:
+        try:
+            input_type.model_validate(req)
+        except ValidationError as e:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid request body with error: {e}"
+            ) from e
+
+    if custom_function is not None:
+        output = await custom_function(req=req)
 
     request_id = "req-" + str(uuid.uuid4())
-    # Acknowledge the request
-    return AcknowledgementResponse(message="Data load request received and is being processed", request_id=request_id)
+
+    res_body = output_type(
+        message="Request received",
+        request_id=request_id,
+        data=output,
+    )
+
+    return res_body
 
 
 @app.websocket(urls.dataset_ws)
-async def websocket_endpoint(websocket: WebSocket, request_id: str):
-    await manager.connect(websocket, request_id)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            catalogue_dataset_id = CatalogueDataset.parse_raw(data)
+async def ws_1(websocket: WebSocket, request_id: str):
+    await ws_handling(
+        websocket,
+        request_id,
+        CatlogId,
+        CatlogData,
+        get_boxmap_catlog_data,
+    )
 
-            response_data = await get_catalogue_dataset(catalogue_dataset_id.catalogue_dataset_id)
-
-            await manager.send_json({"data": response_data}, request_id)
-    except WebSocketDisconnect:
-        manager.disconnect(request_id)
-        print(f"WebSocket disconnected: {request_id}")
-
-
-@app.post(urls.request_acknowledge)
-async def fetch_location_data(location_req: LocationRequest = Body(..., description="""
-Send something like: 
-{
-  "lat": 40.712776,
-  "lng": -74.005974,
-  "radius": 5000,
-  "type": "grocery_or_supermarket"
-}
-""")):
-    try:
-        # Validate the incoming JSON request body
-        location_req = LocationRequest(**location_req.dict())
-    except ValidationError as e:
-        raise HTTPException(status_code=400, detail="Invalid request body")
-
-    request_id = "req-" + str(uuid.uuid4())
-    # Acknowledge the request
-    return AcknowledgementResponse(message="Request received and is being processed", request_id=request_id)
 
 @app.websocket(urls.point_ws)
-async def websocket_endpoint(websocket: WebSocket, request_id: str):
-    await manager.connect(websocket, request_id)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            location_req = LocationRequest.parse_raw(data)
+async def ws_2(websocket: WebSocket, request_id: str):
+    await ws_handling(websocket, request_id, LocationRequest, CatlogId, fetch_data)
 
-            response_data = await fetch_data(location_req, urls)
 
-            await manager.send_json({"data": response_data}, request_id)
-    except WebSocketDisconnect:
-        manager.disconnect(request_id)
-        print(f"WebSocket disconnected: {request_id}")
+@app.get(urls.fetch_acknowlg_id, response_model=restype_fetch_acknowlg_id)
+async def http_2():
+    response = await http_handling(
+        None,
+        None,
+        restype_fetch_acknowlg_id,
+        None,
+    )
+    return response
+
+
+# replace below with just fetch_acknowlg_id again
+# @app.post(urls.fetch_data, response_model=AcknowledgementResponse)
+
+
+@app.get(urls.catlog_collection, response_model=restype_all_catlogs)
+async def http_1():
+    response = await http_handling(
+        None,
+        None,
+        restype_all_catlogs,
+        fetch_catlog_collection,
+    )
+    return response

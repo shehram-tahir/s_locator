@@ -1,130 +1,92 @@
 import axios, { AxiosInstance } from 'axios';
 import urls from '../urls.json';
 
-export interface CreateBusinessData {
-    name: string;
-    address: string;
-    phone: string;
-}
+const baseUrl = urls.REACT_APP_API_URL;
 
-
-export interface Photo {
-    height: number;
-    html_attributions: string[];
-    photo_reference: string;
-    width: number;
-}
-
-export interface Period {
-    close: { day: number; time: string };
-    open: { day: number; time: string };
-}
-
-export interface OpeningHours {
-    open_now: boolean;
-    periods?: Period[] | any[] | null;
-    weekday_text: string[];
-}
-
-export interface Business {
-    business_status: string;
-    formatted_address: string;
-    formatted_phone_number: string;
-    geometry: {
-        location: { lat: number; lng: number };
-        viewport: {
-            northeast: { lat: number; lng: number };
-            southwest: { lat: number; lng: number };
-        };
-    };
-    name: string;
-    opening_hours: OpeningHours;
-    photos: Photo[];
-    rating: number;
-    user_ratings_total: number;
-    website: string;
-}
-
-export interface Catalog {
-    id: string;
-    name: string;
-    description: string;
-    thumbnail_url: string;
-    records_number: number;
-    catalog_link: string;
-    can_access: boolean;
-}
-
-let baseUrl = urls.REACT_APP_API_URL
-let webSocketURL = urls.REACT_APP_WEBSOCKET_URL
-
-const apiClient: AxiosInstance = axios.create({
-    baseURL: baseUrl,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+export const apiClient: AxiosInstance = axios.create({
+  baseURL: baseUrl,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Use once authentication added in project
-// apiClient.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('authToken'); // Adjust the token retrieval as necessary
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+export async function HttpReq<T>(
+  end_point: string,
+  setResData: (data: T | string) => void,
+  setResMessage: (message: string) => void,
+  setResId: (id: string) => void,
+  setLoading: (loading: boolean) => void,
+  setError: (error: Error | null) => void
+) {
+  try {
+    const response = await apiClient.get(`${end_point}`);
+    const message: string = response.data.message;
+    const request_id: string = response.data.request_id;
+    const data: T|string = response.data.data;
 
-export const fetchBusinesses = async (jsonData: {
-    catalogue_dataset_id: string;
-} | undefined): Promise<Business[]> => {
-    try {
+    setResData(data);
+    setResMessage(message);
+    setResId(request_id);
+    setLoading(false);
+    setError(null);
+  } catch (fetchError: any) {
+    setResData("");
+    setResMessage("");
+    setResId("");
+    setLoading(false);
+    setError(fetchError);
+  }
+}
 
-        const response = await apiClient.post(urls.REACT_APP_LOAD_DATASET, jsonData);
 
-        const requestId = response.data.request_id;
 
-        const websocket = new WebSocket(`${baseUrl}${webSocketURL}${requestId}`);
+export async function wSCall<T>(
+  wSURL: string,
+  reqId: string,
+  reqBody: any,
+  setResData: (geoData: T) => void,
+  setResMessage: (message: string) => void,
+  setResId: (id: string) => void,
+  setLoading: (loading: boolean) => void,
+  setError: (error: Event | null) => void
+): Promise<void> {
+  try {
+    const websocket = new WebSocket(`${baseUrl}${wSURL}${reqId}`);
 
-        return new Promise<Business[]>((resolve, reject) => {
-            websocket.onopen = function () {
-                websocket.send(JSON.stringify(jsonData));
-            };
+    websocket.onopen = function onOpen() {
+      websocket.send(JSON.stringify(reqBody));
+    };
 
-            websocket.onmessage = function (event) {
-                const res = JSON.parse(event.data);
-                // websocket.close();
-                resolve(res.data);  // Resolve the promise with the received data
-            };
+    websocket.onmessage = function onMessage(event) {
+      const res = JSON.parse(event.data);
+      setResData(res.data as T);
+      setResMessage(res.message);
+      setResId(res.request_id);
+      setLoading(false);
+      setError(null);
+    };
 
-            websocket.onerror = function (error) {
-                websocket.close();
-                console.error('WebSocket error:', error);
-                reject(error);  // Reject the promise on error
-            };
+    websocket.onerror = function onError(event) {
+      websocket.close();
+      console.error('WebSocket error:', event);
+      setResData("" as T);
+      setResMessage("");
+      setResId("");
+      setLoading(false);
+      setError(event);
+    };
 
-            websocket.onclose = function () {
-                console.log('WebSocket connection closed');
-            };
-        });
+    websocket.onclose = function onClose() {
+      console.log('WebSocket connection closed');
+    };
+  } catch (error) {
+    console.error('Error fetching businesses:', error);
+    setResData("" as T);
+    setResMessage("");
+    setResId("");
+    setLoading(false);
+    setError(error as Event);
+  }
+}
 
-    } catch (error) {
-        console.error('Error catalog full dataset:', error);
-        throw error;
-    }
-};
 
-export const getCatalog = async (): Promise<Catalog[]> => {
-    try {
-        const response = await apiClient.get(urls.ALL_CATALOGS_METADATA);
-        return response.data;
-
-    } catch (error) {
-        console.error('Error fetching all Catalogs metadata:', error);
-        throw error;
-    }
-};

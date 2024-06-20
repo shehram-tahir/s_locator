@@ -1,99 +1,62 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useData } from '../../context/AppDataContext';
 import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
-import { ColDef } from "ag-grid-community";
 import { FaImages } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
-import { Business, OpeningHours, Photo, fetchBusinesses } from "../../services/apiService";
+import { TabularData, Feature } from '../../types/allTypesAndInterfaces';
+import { useGetData } from '../../context/AppDataContext';
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { ColDef } from "ag-grid-community";
 
 
-const ImageRenderer: React.FC<{ value: Photo[] }> = ({ value }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
 
-  return (
-    <div>
-      <button
-        onClick={() => setShowTooltip(!showTooltip)}
-        data-tip
-        data-for="imageTooltip"
-      >
-        <FaImages />
-        <span>{value?.length}</span>
-      </button>
-      {showTooltip && (
-        <Tooltip id="imageTooltip" place="top">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "10px",
-            }}
-          >
-            {value?.map((photo, index) => (
-              <img
-                key={index}
-                src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=YOUR_API_KEY`}
-                alt="Place"
-                style={{ width: "100%", height: "auto" }}
-              />
-            ))}
-          </div>
-        </Tooltip>
-      )}
-    </div>
-  );
-};
+export const columnDefs: ColDef<TabularData>[] = [
+  { headerName: "Name", field: "name", sortable: true, filter: true },
+  {
+    headerName: "Address",
+    field: "formatted_address",
+    sortable: true,
+    filter: true,
+  },
+  {
+    headerName: "Website",
+    field: "website",
+    sortable: true,
+    filter: true,
+  },
+  {
+    headerName: "Rating",
+    field: "rating",
+    sortable: true,
+  },
+  {
+    headerName: "Total Rating",
+    field: "user_ratings_total",
+    sortable: true,
+  },
+];
 
-const OpeningHoursRenderer: React.FC<{ value: OpeningHours }> = ({ value }) => {
-  return (
-    <div>
-      {value?.weekday_text?.map((text, index) => (
-        <div key={index}>{text}</div>
-      ))}
-    </div>
-  );
+export function mapFeatureToTabularData(feature: Feature): TabularData {
+  return {
+    name: feature.properties.name,
+    formatted_address: feature.properties.address,
+    website: feature.properties.website,
+    rating: feature.properties.rating,
+    user_ratings_total: feature.properties.user_ratings_total,
+  };
 };
 
 const Dataview: React.FC = () => {
-  const [rowData, setRowData] = useState();
-  const businessData = useData('businessData');
+  const [businesses, setBusinesses] = useState<TabularData[]>([]);
 
-  if (!businessData) return <div>Loading...</div>;
+  const x = useGetData("geoPoints");
 
-  const [businesses, setBusinesses] = useState<Business[]>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
-    {headerName: "Name", field: "name", sortable: true, filter: true },
-    {headerName: "Address",field: "formatted_address",sortable: true,filter: true,    },
-    {headerName: "Phone Number",field: "formatted_phone_number",sortable: true,filter: true,},
-    {headerName: "Images",field: "photos",cellRenderer: ImageRenderer,cellRendererParams: {  photos: "photos",},},
-    {headerName: "Opening Hours",field: "opening_hours",cellRenderer: OpeningHoursRenderer,cellRendererParams: {  opening_hours: "opening_hours",},},
-    {headerName: "Website",field: "website",sortable: true,filter: true,},
-    {headerName: "Rating",field: "rating",sortable: true,},
-    {headerName: "Total Rating",field: "user_ratings_total",sortable: true,},
-  ]);
-
-  
-  // useEffect(() => {
-    
-  //   const fetchBusinessData = async () => {
-  //     try {
-  //       const obj = JSON.parse(localStorage?.getItem('catalog')?? '{}');
-  //       const data = await fetchBusinesses(obj);
-  //       setBusinesses(data);
-  //     } catch (error: any) {
-  //       setError(error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchBusinessData();
-  // }, []);
+  useEffect(() => {
+    const tabularData = x.features.map(mapFeatureToTabularData);
+    setBusinesses(tabularData);
+  }, [x]);
 
   return (
     <div
@@ -102,7 +65,7 @@ const Dataview: React.FC = () => {
     >
       <AgGridReact
         columnDefs={columnDefs}
-        rowData={businessData}
+        rowData={businesses}
         pagination={true}
         paginationPageSize={10}
         paginationPageSizeSelector={[10, 25, 50]}

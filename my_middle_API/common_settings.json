@@ -4,9 +4,8 @@
     "place_details": "https://maps.googleapis.com/maps/api/place/details/json"
   },
   "enable_CORS_url": "http://localhost:3000",
-  "catalog_metadata":"/fastapi/get_all_catalogues_metadata",
-  "reqst_dataset":"/fastapi/request_dataset_load",
-  "request_acknowledge": "/fastapi/fetch-data",
+  "catlog_collection":"/fastapi/catlog_collection",
+  "fetch_acknowlg_id":"/fastapi/fetch_acknowlg_id",
   "dataset_ws":"/fastapi/ws_dataset_load/{request_id}",
   "point_ws":"/fastapi/ws/{request_id}",
   "google_fields": "name,formatted_address,formatted_phone_number,opening_hours,website,user_ratings_total,business_status,rating,geometry,photos"

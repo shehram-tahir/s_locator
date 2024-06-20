@@ -16,7 +16,7 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
   return ReactDOM.createPortal(
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={onClose}>
+        <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
           &times;
         </button>
         {children}

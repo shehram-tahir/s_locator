@@ -1,15 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Layout from './components/Layout/Layout';
+import Layout from './components/Layout/VertiSideBar';
 import { AppDataProvider } from './context/AppDataContext';
 
 const App: React.FC = () => {
   return (
-    <AppDataProvider>
       <Router>
         <Layout />
       </Router>
-    </AppDataProvider>
   );
 };
 
