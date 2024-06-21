@@ -4,7 +4,7 @@ import CatalogueCard from '../CatalogueCard/CatalogueCard';
 import Modal from '../Modal/Modal';
 import styles from './CatalogueContainer.module.css';
 import { CatalogueContainerProps } from '../../types/allTypesAndInterfaces';
-import {HttpReq} from '../../services/ApiService';
+import {HttpReq} from '../../services/apiService';
 import urls from '../../urls.json';
 import { Catalog } from '../../types/allTypesAndInterfaces';
 import { useNavigate } from 'react-router-dom';
