@@ -4,7 +4,7 @@ import { useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useGetQueryParamObj, createQueryString } from '../../utils/urlUtils';
 import {useSetData } from '../../context/AppDataContext';
-import { HttpReq, wSCall } from '../../services/ApiService'
+import { HttpReq, wSCall } from '../../services/apiService'
 import urls from '../../urls.json';
 import { FeatureCollection } from '../../types/allTypesAndInterfaces';
 
