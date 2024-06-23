@@ -1,17 +1,21 @@
-from all_types.myapi_dtypes import LocationRequest, CatlogId
+from all_types.google_dtypes import GglResponse
+from all_types.myapi_dtypes import LocationReq, CatlogId
+from all_types.myapi_dtypes import CountryCityData
 from google_api_connector import fetch_from_google_maps_api
+from mapbox_connector import MapBoxConnector
 from storage import get_data_from_storage, store_data,get_dataset_from_storage
 import asyncio
 
-async def fetch_data(location_req: LocationRequest, app_config):
+
+async def fetch_nearby(location_req: LocationReq):
     # Try to get data from storage
     data = await get_data_from_storage(location_req)
     if not data:
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
         # If data is not in storage, fetch from Google Maps API
-        data = await fetch_from_google_maps_api(location_req, app_config)
+        data = await fetch_from_google_maps_api(location_req)
         # Store the fetched data in storage
-        await store_data(location_req, data, app_config)
+        # await store_data(location_req, data)
     return data
 
 async def get_catalogue_dataset(catalogue_dataset_id:str):
@@ -85,3 +89,34 @@ async def fetch_catlog_collection(**kwargs):
         )
 
     return metadata
+
+
+async def get_boxmap_catlog_data(catalogue_dataset_id: CatlogId):
+    response_data:GglResponse = await get_catalogue_dataset(
+        catalogue_dataset_id.catalogue_dataset_id
+    )
+    trans_data = await MapBoxConnector.ggl_to_boxmap(response_data)
+    return trans_data
+
+
+async def nearby_boxmap(req):
+    response_data = await fetch_nearby(req)
+    trans_data = await MapBoxConnector.new_ggl_to_boxmap(response_data)
+    return trans_data
+
+
+
+
+async def fetch_country_city_data(**kwargs):
+    data = {
+            "country1": ["city1", "city2", "city3"],
+            "country2": ["cityA", "cityB", "cityC"]
+        }
+
+    return data
+
+
+async def fetch_nearby_categories(**kwargs):
+    data = ["Cat1", "Cat2", "Cat3"]
+
+    return data

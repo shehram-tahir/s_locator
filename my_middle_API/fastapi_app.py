@@ -3,25 +3,33 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
 import uuid
 from all_types.config_dtypes import ApiCommonConfig
-from mapbox_connector import get_boxmap_catlog_data
-from config_factory import ApiConfig
-from data_fetcher import fetch_data, fetch_catlog_collection
+from data_fetcher import (
+    get_boxmap_catlog_data,
+    fetch_catlog_collection, 
+    nearby_boxmap, 
+    fetch_country_city_data,
+    fetch_nearby_categories
+      )
 from all_types.myapi_dtypes import (
-    LocationRequest,
+    LocationReq,
     CatlogId,
     restype_all_catlogs,
     restype_fetch_acknowlg_id,
+    ResTypeMapData,
+    CountryCityData,
+    NearbyCategories
 )
-from all_types.boxmap_dtype import CatlogData
+from all_types.myapi_dtypes import MapData
 from typing import Type, Callable, Awaitable, Any, Optional
+from config_factory import get_conf
 
+CONF = get_conf()
 
-conf = ApiConfig()
 
 app = FastAPI()
 
 # Enable CORS
-origins = [conf.enable_CORS_url]
+origins = [CONF.enable_CORS_url]
 
 app.add_middleware(
     CORSMiddleware,
@@ -61,7 +69,7 @@ async def ws_handling(
     request_id: str,
     input_type: Type[BaseModel],
     output_type: Type[BaseModel],
-    custom_function: Callable[[Any], Awaitable[Any]],
+    custom_function: Callable[[Any], Awaitable[Any]]
 ):
     await manager.connect(websocket, request_id)
     try:
@@ -103,6 +111,7 @@ async def http_handling(
 
     request_id = "req-" + str(uuid.uuid4())
 
+    
     res_body = output_type(
         message="Request received",
         request_id=request_id,
@@ -112,24 +121,34 @@ async def http_handling(
     return res_body
 
 
-@app.websocket(conf.dataset_ws)
-async def ws_1(websocket: WebSocket, request_id: str):
+@app.websocket(CONF.catlog_data)
+async def catlog_data(websocket: WebSocket, request_id: str):
     await ws_handling(
         websocket,
         request_id,
         CatlogId,
-        CatlogData,
+        MapData,
         get_boxmap_catlog_data,
     )
 
 
-@app.websocket(conf.point_ws)
-async def ws_2(websocket: WebSocket, request_id: str):
-    await ws_handling(websocket, request_id, LocationRequest, CatlogId, fetch_data)
+# @app.websocket(CONF.single_nearby)
+# async def single_nearby(websocket: WebSocket, request_id: str):
+#     await ws_handling(websocket, request_id, LocationReq, CatlogData, nearby_boxmap)
 
 
-@app.get(conf.fetch_acknowlg_id, response_model=restype_fetch_acknowlg_id)
-async def http_2():
+@app.post(CONF.http_single_nearby, response_model=ResTypeMapData)
+async def single_nearby(req:LocationReq):
+    response = await http_handling(
+        req,
+        LocationReq,
+        ResTypeMapData,
+        nearby_boxmap,
+    )
+    return response
+
+@app.get(CONF.fetch_acknowlg_id, response_model=restype_fetch_acknowlg_id)
+async def fetch_acknowlg_id():
     response = await http_handling(
         None,
         None,
@@ -140,12 +159,36 @@ async def http_2():
 
 
 
-@app.get(conf.catlog_collection, response_model=restype_all_catlogs)
-async def http_1():
+@app.get(CONF.catlog_collection, response_model=restype_all_catlogs)
+async def catlog_collection():
     response = await http_handling(
         None,
         None,
         restype_all_catlogs,
         fetch_catlog_collection,
+    )
+    return response
+
+
+
+
+@app.get(CONF.country_city, response_model=CountryCityData)
+async def country_city():
+    response = await http_handling(
+        None,
+        None,
+        CountryCityData,
+        fetch_country_city_data,
+    )
+    return response
+
+
+@app.get(CONF.nearby_categories, response_model=NearbyCategories)
+async def nearby_categories():
+    response = await http_handling(
+        None,
+        None,
+        NearbyCategories,
+        fetch_nearby_categories,
     )
     return response

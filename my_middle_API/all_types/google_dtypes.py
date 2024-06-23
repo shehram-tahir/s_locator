@@ -14,5 +14,5 @@ class SingleGoogleGeoDataElement(BaseModel):
     website: str
 
 
-class CatlogResponseData(BaseModel):
+class GglResponse(BaseModel):
     list[SingleGoogleGeoDataElement]

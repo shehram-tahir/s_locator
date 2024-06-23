@@ -1,11 +1,9 @@
-from all_types.google_dtypes import CatlogResponseData
-from all_types.boxmap_dtype import CatlogData
-from all_types.myapi_dtypes import CatlogId
-from data_fetcher import get_catalogue_dataset
+from all_types.google_dtypes import GglResponse
+from all_types.myapi_dtypes import MapData
 
 class MapBoxConnector:
     @classmethod
-    async def ggl_to_boxmap(self, businesses_response: CatlogResponseData) -> CatlogData:
+    async def ggl_to_boxmap(self, businesses_response: GglResponse) -> MapData:
         features = []
 
         for business in businesses_response:
@@ -31,7 +29,41 @@ class MapBoxConnector:
 
             features.append(feature)
 
-        business_data = CatlogData(
+        business_data = MapData(
+            type='FeatureCollection',
+            features=features
+        )
+
+        return business_data.model_dump()
+
+    @classmethod
+    async def new_ggl_to_boxmap(self, businesses_response: GglResponse) -> MapData:
+        features = []
+
+        for business in businesses_response:
+            lng = business.get('location', {}).get('longitude', 0)
+            lat = business.get('location', {}).get('latitude', 0)
+
+            feature = {
+                'type': 'Feature',
+                'properties': {
+                    'name': business.get('displayName', '').get("text",""),
+                    'rating': business.get('rating', ''),
+                    'address': business.get('formattedAddress', ''),
+                    'phone': business.get('internationalPhoneNumber', business.get('nationalPhoneNumber', '')),
+                    'website': business.get('websiteUri', ''),
+                    'business_status': business.get('businessStatus', ''),
+                    'user_ratings_total': business.get('userRatingCount', '')
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [lng, lat]
+                }
+            }
+
+            features.append(feature)
+
+        business_data = MapData(
             type='FeatureCollection',
             features=features
         )
@@ -39,12 +71,8 @@ class MapBoxConnector:
         return business_data.model_dump()
 
 
-async def get_boxmap_catlog_data(catalogue_dataset_id: CatlogId):
-    response_data:CatlogResponseData = await get_catalogue_dataset(
-        catalogue_dataset_id.catalogue_dataset_id
-    )
-    trans_data = await MapBoxConnector.ggl_to_boxmap(response_data)
-    return trans_data
+
+
 
 
 

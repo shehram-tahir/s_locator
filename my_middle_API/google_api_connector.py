@@ -1,29 +1,31 @@
-# import requests
+import requests
 
-# from all_types.myapi_dtypes import LocationRequest
-# from config_factory import ApiConfig
+from all_types.myapi_dtypes import LocationReq
+from config_factory import get_conf
 
-# async def fetch_from_google_maps_api(location_req: LocationRequest, conf:ApiConfig):
+CONF = get_conf()
+
+# async def fetch_from_google_maps_api(location_req: LocationRequest):
 #     lat, lng, radius, place_type = location_req.lat, location_req.lng, location_req.radius, location_req.type
 #     params = {
-#         'key': conf.api_key,
+#         'key': CONF.api_key,
 #         'location': f"{lat},{lng}",
 #         'radius': radius,
 #         'type': place_type
 #     }
 
-#     response = requests.get(conf.nearby_search, params=params)
+#     response = requests.get(CONF.nearby_search, params=params)
 #     results = response.json()
 
 #     output_data = []
 #     if 'results' in results:
 #         for place in results['results']:
 #             details_params = {
-#                 'key': conf.api_key,
+#                 'key': CONF.api_key,
 #                 'place_id': place['place_id'],
-#                 'fields': conf.google_fields
+#                 'fields': CONF.google_fields
 #             }
-#             details_response = requests.get(conf.place_details, params=details_params)
+#             details_response = requests.get(CONF.place_details, params=details_params)
 #             place_details = details_response.json().get('result', {})
 #             output_data.append(place_details)
 
@@ -31,16 +33,13 @@
 
 
 
-import requests
-
-async def fetch_from_google_maps_api(req: LocationRequest, conf:ApiConfig):
+async def fetch_from_google_maps_api(req: LocationReq):
     lat, lng, radius, place_type = req.lat, req.lng, req.radius, req.type
 
-    url = "https://places.googleapis.com/v1/places:searchNearby"
-
+    
     headers = {
         "Content-Type": "application/json",
-        "X-Goog-Api-Key": conf.api_key,
+        "X-Goog-Api-Key": CONF.api_key,
         "X-Goog-FieldMask": "*"
     }
 
@@ -57,11 +56,10 @@ async def fetch_from_google_maps_api(req: LocationRequest, conf:ApiConfig):
         }
     }
 
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(CONF.nearby_search, headers=headers, json=data)
 
     if response.status_code == 200:
-        results = response.json()
-        # Process the results here
-        print(results)
+        results = response.json().get("places","")
+        return results
     else:
         print("Error:", response.status_code)

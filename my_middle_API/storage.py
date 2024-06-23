@@ -33,18 +33,20 @@
 import json
 import os
 
-from all_types.myapi_dtypes import LocationRequest
+from all_types.myapi_dtypes import LocationReq
+from config_factory import get_conf
 
+CONF = get_conf()
 STORAGE_DIR = 'Backend/storage'
 os.makedirs(STORAGE_DIR, exist_ok=True)
 
 
-def get_filename(location_req: LocationRequest):
+def get_filename(location_req: LocationReq):
     lat, lng, radius, place_type = location_req.lat, location_req.lng, location_req.radius, location_req.type
     return f"{STORAGE_DIR}/data_{lat}_{lng}_{radius}_{place_type}.json"
 
 
-async def get_data_from_storage(location_req: LocationRequest):
+async def get_data_from_storage(location_req: LocationReq):
     filename = get_filename(location_req)
     if os.path.exists(filename):
         with open(filename, 'r') as file:
@@ -58,7 +60,7 @@ async def get_dataset_from_storage(dataset_id:str):
             return json.load(file)
     return None
 
-async def store_data(location_req: LocationRequest, data, app_config):
+async def store_data(location_req: LocationReq, data):
     filename = get_filename(location_req)
     with open(filename, 'w') as file:
         json.dump(data, file)

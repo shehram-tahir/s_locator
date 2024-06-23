@@ -3,17 +3,21 @@ from dataclasses import dataclass, fields, is_dataclass
 
 
 @dataclass
-class ApiConfig:
+class static_ApiConfig:
     api_key:str = ""
-    ggl_base_url: str = "https://maps.googleapis.com/maps/api/place/"
-    nearby_search: str = ggl_base_url + "nearbysearch/json"
+    ggl_base_url: str = "https://places.googleapis.com/v1/places:"
+    nearby_search: str = ggl_base_url + "searchNearby"
     place_details: str = ggl_base_url + "details/json"
     enable_CORS_url: str = "http://localhost:3000"
     catlog_collection: str = "/fastapi/catlog_collection"
     fetch_acknowlg_id: str = "/fastapi/fetch_acknowlg_id"
-    dataset_ws: str = "/fastapi/ws_dataset_load/{request_id}"
-    point_ws: str = "/fastapi/ws/{request_id}"
+    catlog_data: str = "/fastapi/ws_dataset_load/{request_id}"
+    single_nearby: str = "/fastapi/ws/{request_id}"
+    http_single_nearby:str = "/fastapi/http_single_nearby"
+    country_city:str = "/fastapi/country_city"
+    nearby_categories:str = "/fastapi/nearby_categories"
     google_fields: str = "name,formatted_address,user_ratings_total,rating,geometry"
+
 
 
 @dataclass
@@ -68,3 +72,21 @@ class ConfigFactory:
 #     'G:\\My Drive\\Personal\\Work\\offline\\Jupyter\\Git\\s_locator\\common_settings.json', ApiCommonConfig)
 # print(config.api_key)  # Output: your_api_key
 # print(config.base_urls.google)  # Output: https://maps.googleapis.com/maps/api
+
+
+def get_conf():
+    conf = static_ApiConfig()
+    with open("secrets.json", 'r') as config_file:
+        conf.api_key = json.load(config_file).get("gmaps_api","")
+
+    return conf
+
+
+
+
+
+
+
+
+
+
