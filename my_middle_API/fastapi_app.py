@@ -120,7 +120,7 @@ async def http_handling(
 
     return res_body
 
-http_catlog_data
+
 # @app.websocket(CONF.catlog_data)
 # async def catlog_data(websocket: WebSocket, request_id: str):
 #     await ws_handling(
