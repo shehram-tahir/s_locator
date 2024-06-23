@@ -37,35 +37,54 @@ const MapContainer: React.FC = () => {
 
   // Store the catalogue_dataset_id in the context when it changes
   const setData = useSetData();
+  // useEffect(function () {
+  //   if (catalogueDatasetId) {
+  //     setData("catalogue_dataset_id", catalogueDatasetId);
+  //     HttpReq<string>(
+  //       urls.fetch_acknowlg_id,
+  //       setResData,
+  //       setResMessage,
+  //       setResId,
+  //       setLoading,
+  //       setError
+  //     );
+  //   }
+  // }, [catalogueDatasetId]);
+  
+  // useEffect(function () {
+  //   if (resId) {
+  //     const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
+  //     wSCall<FeatureCollection>(
+  //       urls.ws_dataset_load,
+  //       resId,
+  //       apiJsonRequest,
+  //       setGeoPoints,
+  //       setWsResMessage,
+  //       setWsResId,
+  //       setWsResLoading,
+  //       setWsResError
+  //     );
+  //   }
+  // }, [resId, catalogueDatasetId]);
+
+
   useEffect(function () {
     if (catalogueDatasetId) {
       setData("catalogue_dataset_id", catalogueDatasetId);
+      const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
       HttpReq<string>(
-        urls.fetch_acknowlg_id,
+        urls.http_catlog_data,
         setResData,
         setResMessage,
         setResId,
         setLoading,
-        setError
+        setError,
+        "post",
+        apiJsonRequest
       );
     }
   }, [catalogueDatasetId]);
-  
-  useEffect(function () {
-    if (resId) {
-      const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
-      wSCall<FeatureCollection>(
-        urls.ws_dataset_load,
-        resId,
-        apiJsonRequest,
-        setGeoPoints,
-        setWsResMessage,
-        setWsResId,
-        setWsResLoading,
-        setWsResError
-      );
-    }
-  }, [resId, catalogueDatasetId]);
+
 
   useEffect(function () {
     if (geoPoints != ''){

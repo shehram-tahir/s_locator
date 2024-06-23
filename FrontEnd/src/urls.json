@@ -2,5 +2,6 @@
     "REACT_APP_API_URL": "http://localhost:8000/fastapi",
     "catlog_collection": "/catlog_collection",
     "fetch_acknowlg_id": "/fetch_acknowlg_id",
-    "ws_dataset_load": "/ws_dataset_load/"
+    "ws_dataset_load": "/ws_dataset_load/",
+    "http_catlog_data": "http_catlog_data"
 }

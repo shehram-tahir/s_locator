@@ -120,17 +120,26 @@ async def http_handling(
 
     return res_body
 
+http_catlog_data
+# @app.websocket(CONF.catlog_data)
+# async def catlog_data(websocket: WebSocket, request_id: str):
+#     await ws_handling(
+#         websocket,
+#         request_id,
+#         CatlogId,
+#         MapData,
+#         get_boxmap_catlog_data,
+#     )
 
-@app.websocket(CONF.catlog_data)
-async def catlog_data(websocket: WebSocket, request_id: str):
-    await ws_handling(
-        websocket,
-        request_id,
+@app.post(CONF.http_catlog_data, response_model=ResTypeMapData)
+async def catlog_data(req:LocationReq):
+    response = await http_handling(
+        req,
         CatlogId,
-        MapData,
+        ResTypeMapData,
         get_boxmap_catlog_data,
     )
-
+    return response
 
 # @app.websocket(CONF.single_nearby)
 # async def single_nearby(websocket: WebSocket, request_id: str):

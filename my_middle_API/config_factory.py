@@ -12,6 +12,7 @@ class static_ApiConfig:
     catlog_collection: str = "/fastapi/catlog_collection"
     fetch_acknowlg_id: str = "/fastapi/fetch_acknowlg_id"
     catlog_data: str = "/fastapi/ws_dataset_load/{request_id}"
+    http_catlog_data:str = "/fastapi/http_catlog_data"
     single_nearby: str = "/fastapi/ws/{request_id}"
     http_single_nearby:str = "/fastapi/http_single_nearby"
     country_city:str = "/fastapi/country_city"

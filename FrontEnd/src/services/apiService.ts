@@ -10,19 +10,50 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
+// export async function HttpReq<T>(
+//   end_point: string,
+//   setResData: (data: T | string) => void,
+//   setResMessage: (message: string) => void,
+//   setResId: (id: string) => void,
+//   setLoading: (loading: boolean) => void,
+//   setError: (error: Error | null) => void
+// ) {
+//   try {
+//     const response = await apiClient.get(`${end_point}`);
+//     const message: string = response.data.message;
+//     const request_id: string = response.data.request_id;
+//     const data: T|string = response.data.data;
+
+//     setResData(data);
+//     setResMessage(message);
+//     setResId(request_id);
+//     setLoading(false);
+//     setError(null);
+//   } catch (fetchError: any) {
+//     setResData("");
+//     setResMessage("");
+//     setResId("");
+//     setLoading(false);
+//     setError(fetchError);
+//   }
+// }
+
 export async function HttpReq<T>(
   end_point: string,
   setResData: (data: T | string) => void,
   setResMessage: (message: string) => void,
   setResId: (id: string) => void,
   setLoading: (loading: boolean) => void,
-  setError: (error: Error | null) => void
+  setError: (error: Error | null) => void,
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'get',
+  body?: any
 ) {
   try {
-    const response = await apiClient.get(`${end_point}`);
+    const response = await apiClient[method](end_point, method !== 'get' ? body : undefined);
+
     const message: string = response.data.message;
     const request_id: string = response.data.request_id;
-    const data: T|string = response.data.data;
+    const data: T | string = response.data.data;
 
     setResData(data);
     setResMessage(message);
@@ -30,14 +61,13 @@ export async function HttpReq<T>(
     setLoading(false);
     setError(null);
   } catch (fetchError: any) {
-    setResData("");
+    setResData("" as T);
     setResMessage("");
     setResId("");
     setLoading(false);
     setError(fetchError);
   }
 }
-
 
 
 export async function wSCall<T>(
