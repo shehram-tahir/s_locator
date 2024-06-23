@@ -3,6 +3,20 @@ from dataclasses import dataclass, fields, is_dataclass
 
 
 @dataclass
+class ApiConfig:
+    api_key:str = ""
+    ggl_base_url: str = "https://maps.googleapis.com/maps/api/place/"
+    nearby_search: str = ggl_base_url + "nearbysearch/json"
+    place_details: str = ggl_base_url + "details/json"
+    enable_CORS_url: str = "http://localhost:3000"
+    catlog_collection: str = "/fastapi/catlog_collection"
+    fetch_acknowlg_id: str = "/fastapi/fetch_acknowlg_id"
+    dataset_ws: str = "/fastapi/ws_dataset_load/{request_id}"
+    point_ws: str = "/fastapi/ws/{request_id}"
+    google_fields: str = "name,formatted_address,user_ratings_total,rating,geometry"
+
+
+@dataclass
 class ConfigDict:
     def __init__(self, dictionary):
         for key, value in dictionary.items():
@@ -16,7 +30,7 @@ class ConfigFactory:
     @staticmethod
     def load_config(file_path: str, config_class):
         # Load configuration from a JSON file
-        with open(file_path, 'r') as config_file:
+        with open(file_path, "r") as config_file:
             config_data = json.load(config_file)
 
         # Recursively convert dictionaries to instances of the config class

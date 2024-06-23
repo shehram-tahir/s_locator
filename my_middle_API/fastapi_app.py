@@ -4,7 +4,7 @@ from pydantic import BaseModel, ValidationError
 import uuid
 from all_types.config_dtypes import ApiCommonConfig
 from mapbox_connector import get_boxmap_catlog_data
-from config_factory import ConfigFactory
+from config_factory import ApiConfig
 from data_fetcher import fetch_data, fetch_catlog_collection
 from all_types.myapi_dtypes import (
     LocationRequest,
@@ -16,18 +16,12 @@ from all_types.boxmap_dtype import CatlogData
 from typing import Type, Callable, Awaitable, Any, Optional
 
 
-urls = ConfigFactory.load_config("common_settings.json", ApiCommonConfig)
-try:
-    secrets_config = ConfigFactory.load_config("secret_settings.json", ApiCommonConfig)
-    urls.api_key = secrets_config.api_key
-except:
-    urls.api_key = ""
-
+conf = ApiConfig()
 
 app = FastAPI()
 
 # Enable CORS
-origins = [urls.enable_CORS_url]
+origins = [conf.enable_CORS_url]
 
 app.add_middleware(
     CORSMiddleware,
@@ -118,7 +112,7 @@ async def http_handling(
     return res_body
 
 
-@app.websocket(urls.dataset_ws)
+@app.websocket(conf.dataset_ws)
 async def ws_1(websocket: WebSocket, request_id: str):
     await ws_handling(
         websocket,
@@ -129,12 +123,12 @@ async def ws_1(websocket: WebSocket, request_id: str):
     )
 
 
-@app.websocket(urls.point_ws)
+@app.websocket(conf.point_ws)
 async def ws_2(websocket: WebSocket, request_id: str):
     await ws_handling(websocket, request_id, LocationRequest, CatlogId, fetch_data)
 
 
-@app.get(urls.fetch_acknowlg_id, response_model=restype_fetch_acknowlg_id)
+@app.get(conf.fetch_acknowlg_id, response_model=restype_fetch_acknowlg_id)
 async def http_2():
     response = await http_handling(
         None,
@@ -146,7 +140,7 @@ async def http_2():
 
 
 
-@app.get(urls.catlog_collection, response_model=restype_all_catlogs)
+@app.get(conf.catlog_collection, response_model=restype_all_catlogs)
 async def http_1():
     response = await http_handling(
         None,
