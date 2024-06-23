@@ -3,7 +3,7 @@ from all_types.myapi_dtypes import LocationReq, CatlogId
 from all_types.myapi_dtypes import CountryCityData
 from google_api_connector import fetch_from_google_maps_api
 from mapbox_connector import MapBoxConnector
-from storage import get_data_from_storage, store_data,get_dataset_from_storage
+from storage import get_data_from_storage, store_data, get_dataset_from_storage
 import asyncio
 
 
@@ -15,10 +15,11 @@ async def fetch_nearby(location_req: LocationReq):
         # If data is not in storage, fetch from Google Maps API
         data = await fetch_from_google_maps_api(location_req)
         # Store the fetched data in storage
-        # await store_data(location_req, data)
+        await store_data(location_req, data)
     return data
 
-async def get_catalogue_dataset(catalogue_dataset_id:str):
+
+async def get_catalogue_dataset(catalogue_dataset_id: str):
     data = await get_dataset_from_storage(catalogue_dataset_id)
     if not data:
         data = {}
@@ -92,7 +93,7 @@ async def fetch_catlog_collection(**kwargs):
 
 
 async def get_boxmap_catlog_data(catalogue_dataset_id: CatlogId):
-    response_data:GglResponse = await get_catalogue_dataset(
+    response_data: GglResponse = await get_catalogue_dataset(
         catalogue_dataset_id.catalogue_dataset_id
     )
     trans_data = await MapBoxConnector.ggl_to_boxmap(response_data)
@@ -105,18 +106,24 @@ async def nearby_boxmap(req):
     return trans_data
 
 
-
-
 async def fetch_country_city_data(**kwargs):
     data = {
-            "country1": ["city1", "city2", "city3"],
-            "country2": ["cityA", "cityB", "cityC"]
-        }
+        "country1": [
+            {"name": "city1", "lat": 37.7937, "lng": -122.3965, "radius": 1000},
+            {"name": "city2", "lat": 37.7937, "lng": -122.3965, "radius": 1000},
+            {"name": "city3", "lat": 37.7937, "lng": -122.3965, "radius": 1000},
+        ],
+        "country2": [
+            {"name": "cityA", "lat": 37.7937, "lng": -122.3965, "radius": 1000},
+            {"name": "cityB", "lat": 37.7937, "lng": -122.3965, "radius": 1000},
+            {"name": "cityC", "lat": 37.7937, "lng": -122.3965, "radius": 1000},
+        ],
+    }
 
     return data
 
 
 async def fetch_nearby_categories(**kwargs):
-    data = ["Cat1", "Cat2", "Cat3"]
+    data = ["convenience_store", "Cat2", "Cat3"]
 
     return data

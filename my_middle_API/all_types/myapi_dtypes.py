@@ -72,9 +72,16 @@ class MapData(BaseModel):
 class ResTypeMapData(ResDefault):
     data: MapData
 
+class CityData(BaseModel):
+    name: str
+    lat: float
+    lng: float
+    radius: int
+    type: str = None
 
-class CountryCityData(ResDefault):
-    data: Dict[str, List[str]]
+class CountryCityData(BaseModel):
+    data: Dict[str, List[CityData]]
+
 
 class NearbyCategories(ResDefault):
     data: List[str]

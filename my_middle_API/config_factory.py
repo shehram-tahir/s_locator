@@ -76,8 +76,11 @@ class ConfigFactory:
 
 def get_conf():
     conf = static_ApiConfig()
-    with open("secrets.json", 'r') as config_file:
-        conf.api_key = json.load(config_file).get("gmaps_api","")
+    try:	
+        with open("secrets.json", 'r') as config_file:
+            conf.api_key = json.load(config_file).get("gmaps_api","")
+    except:
+        conf.api_key = ""
 
     return conf
 
