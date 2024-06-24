@@ -92,9 +92,9 @@ async def fetch_catlog_collection(**kwargs):
     return metadata
 
 
-async def get_boxmap_catlog_data(catalogue_dataset_id: CatlogId):
+async def get_boxmap_catlog_data(req: CatlogId):
     response_data: GglResponse = await get_catalogue_dataset(
-        catalogue_dataset_id.catalogue_dataset_id
+        req.catalogue_dataset_id
     )
     trans_data = await MapBoxConnector.ggl_to_boxmap(response_data)
     return trans_data

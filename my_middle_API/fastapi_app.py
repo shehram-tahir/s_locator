@@ -132,9 +132,9 @@ async def http_handling(
 #     )
 
 @app.post(CONF.http_catlog_data, response_model=ResTypeMapData)
-async def catlog_data(req:LocationReq):
+async def catlog_data(catlog_req:CatlogId):
     response = await http_handling(
-        req,
+        catlog_req,
         CatlogId,
         ResTypeMapData,
         get_boxmap_catlog_data,

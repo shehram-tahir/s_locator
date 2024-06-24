@@ -40,7 +40,7 @@ export const apiClient: AxiosInstance = axios.create({
 
 export async function HttpReq<T>(
   end_point: string,
-  setResData: (data: T | string) => void,
+  setResData: React.Dispatch<React.SetStateAction<T | string>>,
   setResMessage: (message: string) => void,
   setResId: (id: string) => void,
   setLoading: (loading: boolean) => void,

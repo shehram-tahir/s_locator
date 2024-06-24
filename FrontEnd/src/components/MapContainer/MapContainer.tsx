@@ -21,11 +21,11 @@ const MapContainer: React.FC = () => {
   const queryParamObj = useGetQueryParamObj();
   const catalogueDatasetId = queryParamObj.get("catalogue_dataset_id");
 
-  const [geoPoints, setGeoPoints] = useState<FeatureCollection | ''>('');
+  const [geoPoints, setGeoPoints] = useState<FeatureCollection | string>('');
   const [wsResMessage, setWsResMessage] = useState<string>('');
   const [wsResId, setWsResId] = useState<string>('');
   const [wsResloading, setWsResLoading] = useState<boolean>(true);
-  const [wsReserror, setWsResError] = useState<Event | null>(null);
+  const [wsReserror, setWsResError] = useState<Error | null>(null);
 
 
   const [resData, setResData] = useState<string>('');
@@ -72,13 +72,13 @@ const MapContainer: React.FC = () => {
     if (catalogueDatasetId) {
       setData("catalogue_dataset_id", catalogueDatasetId);
       const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
-      HttpReq<string>(
+      HttpReq<FeatureCollection>(
         urls.http_catlog_data,
-        setResData,
-        setResMessage,
-        setResId,
-        setLoading,
-        setError,
+        setGeoPoints,
+        setWsResMessage,
+        setWsResId,
+        setWsResLoading,
+        setWsResError,
         "post",
         apiJsonRequest
       );
@@ -87,7 +87,7 @@ const MapContainer: React.FC = () => {
 
 
   useEffect(function () {
-    if (geoPoints != ''){
+    if (typeof geoPoints !== 'string') {
       setData("geoPoints", geoPoints);
   }
   }, [geoPoints]);
@@ -102,7 +102,7 @@ const MapContainer: React.FC = () => {
     });
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
-    if (geoPoints) {
+    if (typeof geoPoints !== 'string') {
       map.on("load", () => {
         if (!!geoPoints?.features && geoPoints?.features?.length) {
           map.setCenter(geoPoints?.features[0]?.geometry?.coordinates);
