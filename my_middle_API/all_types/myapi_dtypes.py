@@ -27,7 +27,7 @@ class restype_fetch_acknowlg_id(ResDefault):
 
 
 
-class catlog_metadata(BaseModel):
+class card_metadata(BaseModel):
     id: str
     name: str
     description: str
@@ -37,10 +37,10 @@ class catlog_metadata(BaseModel):
     can_access: int
 
 
-class restype_all_catlogs(ResDefault):
+class restype_all_cards(ResDefault):
     message: str
     request_id: str
-    data: list[catlog_metadata]
+    data: list[card_metadata]
 
 
 

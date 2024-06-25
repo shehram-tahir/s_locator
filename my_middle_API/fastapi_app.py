@@ -8,12 +8,13 @@ from data_fetcher import (
     fetch_catlog_collection, 
     nearby_boxmap, 
     fetch_country_city_data,
-    fetch_nearby_categories
+    fetch_nearby_categories,
+    fetch_layer_collection
       )
 from all_types.myapi_dtypes import (
     LocationReq,
     CatlogId,
-    restype_all_catlogs,
+    restype_all_cards,
     restype_fetch_acknowlg_id,
     ResTypeMapData,
     CountryCityData,
@@ -168,16 +169,25 @@ async def fetch_acknowlg_id():
 
 
 
-@app.get(CONF.catlog_collection, response_model=restype_all_catlogs)
+@app.get(CONF.catlog_collection, response_model=restype_all_cards)
 async def catlog_collection():
     response = await http_handling(
         None,
         None,
-        restype_all_catlogs,
+        restype_all_cards,
         fetch_catlog_collection,
     )
     return response
 
+@app.get(CONF.layer_collection, response_model=restype_all_cards)
+async def layer_collection():
+    response = await http_handling(
+        None,
+        None,
+        restype_all_cards,
+        fetch_layer_collection,
+    )
+    return response
 
 
 

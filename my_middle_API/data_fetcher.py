@@ -92,6 +92,33 @@ async def fetch_catlog_collection(**kwargs):
     return metadata
 
 
+async def fetch_layer_collection(**kwargs):
+    metadata = [
+        {
+            "id": "2",
+            "name": "Saudi Arabia - Real Estate Transactions",
+            "description": "Database of real-estate transactions in Saudi Arabia",
+            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/real_estate_ksa.png",
+            "catalog_link": "https://example.com/catalog2.jpg",
+            "records_number": 20,
+            "can_access": False,
+        },
+        {
+            "id": "3",
+            "name": "Saudi Arabia - 3",
+            "description": "Database of all Saudi Arabia gas stations Points of Interests",
+            "thumbnail_url": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/SAUgasStations.PNG",
+            "catalog_link": "https://catalog-assets.s3.ap-northeast-1.amazonaws.com/SAUgasStations.PNG",
+            "records_number": 8517,
+            "can_access": False,
+        },
+
+    ]
+
+    return metadata
+
+
+
 async def get_boxmap_catlog_data(req: CatlogId):
     response_data: GglResponse = await get_catalogue_dataset(
         req.catalogue_dataset_id
