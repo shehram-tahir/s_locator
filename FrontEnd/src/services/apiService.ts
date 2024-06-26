@@ -48,8 +48,12 @@ export async function HttpReq<T>(
   method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'get',
   body?: any
 ) {
+  setLoading(true); 
   try {
-    const response = await apiClient[method](end_point, method !== 'get' ? body : undefined);
+    const response = await apiClient[method](
+      end_point,
+      method !== "get" ? body : undefined
+    );
 
     const message: string = response.data.message;
     const request_id: string = response.data.request_id;

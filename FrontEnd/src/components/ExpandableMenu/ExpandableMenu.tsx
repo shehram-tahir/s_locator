@@ -1,12 +1,8 @@
 import React from "react";
 import styles from "./ExpandableMenu.module.css";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import {ExpandableMenuProps} from "../../types/allTypesAndInterfaces"
 
-interface ExpandableMenuProps {
-  isExpanded: boolean;
-  toggleMenu: () => void;
-  children?: React.ReactNode;
-}
 
 const ExpandableMenu: React.FC<ExpandableMenuProps> = ({
   isExpanded,

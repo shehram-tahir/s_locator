@@ -1,22 +1,41 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import styles from './Modal.module.css';
+import React from "react";
+import ReactDOM from "react-dom";
+import styles from "./Modal.module.css";
+import { ModalProps } from "../../types/allTypesAndInterfaces";
 
-interface ModalProps {
-  show: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
+function Modal(props: ModalProps) {
+  const {
+    show,
+    onClose,
+    children,
+    modalClass = "",
+    homePageModal = false,
+  } = props;
 
-const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
   if (!show) {
     return null;
   }
 
+  let combinedClassNames = `${styles.modalContent}`;
+
+  if (modalClass === "smallerContainer") {
+    combinedClassNames += ` ${styles.smallerContainer}`;
+  } else if (modalClass === "smallerContainerv2") {
+    combinedClassNames += ` ${styles.smallerContainerv2}`;
+  }
+
   return ReactDOM.createPortal(
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
+    <div
+      className={`${styles.modalOverlay} ${
+        homePageModal ? styles.modalOverlayFirstLoad : ""
+      }`}
+    >
+      <div className={combinedClassNames}>
+        <button
+          className={styles.closeButton}
+          onClick={onClose}
+          aria-label="Close modal"
+        >
           &times;
         </button>
         {children}
@@ -24,6 +43,6 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
     </div>,
     document.body
   );
-};
+}
 
 export default Modal;

@@ -1,39 +1,37 @@
 // src/components/MapContainer/MapContainer.tsx
-import React, { useEffect } from 'react';
-import { useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import { useGetQueryParamObj, createQueryString } from '../../utils/urlUtils';
-import {useSetData } from '../../context/AppDataContext';
-import { HttpReq, wSCall } from '../../services/apiService'
-import urls from '../../urls.json';
-import { FeatureCollection } from '../../types/allTypesAndInterfaces';
-
+import React, { useEffect } from "react";
+import { useState } from "react";
+import mapboxgl from "mapbox-gl";
+import { useGetQueryParamObj, createQueryString } from "../../utils/urlUtils";
+import { useSetData } from "../../context/AppDataContext";
+import { HttpReq, wSCall } from "../../services/apiService";
+import urls from "../../urls.json";
+import { FeatureCollection } from "../../types/allTypesAndInterfaces";
+import { useLayerContext } from "../../context/LayerContext";
 
 mapboxgl.accessToken = process.env?.REACT_APP_MAPBOX_KEY ?? "";
 mapboxgl.setRTLTextPlugin(
-  'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
-  () => { }
+  "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js",
+  () => {}
 );
 
-
 const MapContainer: React.FC = () => {
+  const { firstFormResponse } = useLayerContext();
 
   const queryParamObj = useGetQueryParamObj();
   const catalogueDatasetId = queryParamObj.get("catalogue_dataset_id");
 
-  const [geoPoints, setGeoPoints] = useState<FeatureCollection | string>('');
-  const [wsResMessage, setWsResMessage] = useState<string>('');
-  const [wsResId, setWsResId] = useState<string>('');
+  const [geoPoints, setGeoPoints] = useState<FeatureCollection | string>("");
+  const [wsResMessage, setWsResMessage] = useState<string>("");
+  const [wsResId, setWsResId] = useState<string>("");
   const [wsResloading, setWsResLoading] = useState<boolean>(true);
   const [wsReserror, setWsResError] = useState<Error | null>(null);
 
-
-  const [resData, setResData] = useState<string>('');
-  const [resMessage, setResMessage] = useState<string>('');
-  const [resId, setResId] = useState<string>('');
+  const [resData, setResData] = useState<string>("");
+  const [resMessage, setResMessage] = useState<string>("");
+  const [resId, setResId] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-
 
   // Store the catalogue_dataset_id in the context when it changes
   const setData = useSetData();
@@ -50,7 +48,7 @@ const MapContainer: React.FC = () => {
   //     );
   //   }
   // }, [catalogueDatasetId]);
-  
+
   // useEffect(function () {
   //   if (resId) {
   //     const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
@@ -67,30 +65,37 @@ const MapContainer: React.FC = () => {
   //   }
   // }, [resId, catalogueDatasetId]);
 
+  useEffect(
+    function () {
+      if (catalogueDatasetId) {
+        setData("catalogue_dataset_id", catalogueDatasetId);
+        const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
+        HttpReq<FeatureCollection>(
+          urls.http_catlog_data,
+          setGeoPoints,
+          setWsResMessage,
+          setWsResId,
+          setWsResLoading,
+          setWsResError,
+          "post",
+          apiJsonRequest
+        );
+      }
+    },
+    [catalogueDatasetId]
+  );
 
-  useEffect(function () {
-    if (catalogueDatasetId) {
-      setData("catalogue_dataset_id", catalogueDatasetId);
-      const apiJsonRequest = { catalogue_dataset_id: catalogueDatasetId };
-      HttpReq<FeatureCollection>(
-        urls.http_catlog_data,
-        setGeoPoints,
-        setWsResMessage,
-        setWsResId,
-        setWsResLoading,
-        setWsResError,
-        "post",
-        apiJsonRequest
-      );
+  useEffect(() => {
+    if (firstFormResponse) {
+      setGeoPoints(firstFormResponse as string);
     }
-  }, [catalogueDatasetId]);
+  }, [firstFormResponse]);
 
-
-  useEffect(function () {
-    if (typeof geoPoints !== 'string') {
-      setData("geoPoints", geoPoints);
-  }
-  }, [geoPoints]);
+  // useEffect(function () {
+  //   if (typeof geoPoints !== 'string') {
+  //     setData("geoPoints", geoPoints);
+  // }
+  // }, [geoPoints]);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -102,7 +107,7 @@ const MapContainer: React.FC = () => {
     });
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
-    if (typeof geoPoints !== 'string') {
+    if (typeof geoPoints !== "string") {
       map.on("load", () => {
         if (!!geoPoints?.features && geoPoints?.features?.length) {
           map.setCenter(geoPoints?.features[0]?.geometry?.coordinates);

@@ -4,25 +4,42 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.modalOverlayFirstLoad {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modalContent {
   background: white;
   padding: 20px;
   border-radius: 4px;
-  width: 80%;
-  max-width: 900px;
+  width: 100%;
+  max-width: 950px;
   /* Increased to ensure cards fit nicely */
+  min-height: 80%;
   max-height: 80%;
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   position: relative;
+}
+
+.smallerContainer {
+  max-width: 400px;
+  position: absolute;
+  left: 120px;
+}
+
+.smallerContainerv2{
+  max-width: 400px;
+  position: absolute;
+  left: 120px;
+
 }
 
 .closeButton {

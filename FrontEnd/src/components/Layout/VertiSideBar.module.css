@@ -7,34 +7,12 @@
   flex-grow: 1;
 }
 
-.menuList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  color: #fff;
-}
 
-.menuList li {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px;
-}
 
-.menuList li a {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  align-items: center;
-}
 
-.iconItems {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.icon {
-  margin: 5px;
-  font-size: 1.2em;
+.CreateCatalogMenu {
+  padding: 1.5rem;
+  width: 330px;
+  background-color: rgb(17, 87, 64);
   color: #fff;
 }

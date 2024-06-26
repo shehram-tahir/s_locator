@@ -43,8 +43,8 @@ export function mapFeatureToTabularData(feature: Feature): TabularData {
     name: feature.properties.name,
     formatted_address: feature.properties.address,
     website: feature.properties.website,
-    rating: feature.properties.rating,
-    user_ratings_total: feature.properties.user_ratings_total,
+    rating: Number(feature.properties.rating), 
+    user_ratings_total: Number(feature.properties.user_ratings_total), 
   };
 };
 

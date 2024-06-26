@@ -110,3 +110,8 @@
 .moreInfo:hover {
   color: #40a9ff;
 }
+
+.add{
+  color: red;
+  font-weight: 500;
+}
