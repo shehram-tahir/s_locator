@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: flex-start;
   padding-bottom: 20px;
-  border-bottom: 1px solid #1b4f40; /* Darker green for subtle separation */
+  border-bottom: 1px solid #1b4f40; 
   gap: 15px;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .addDataButton {
-  background-color: #28a745; /* Bright green */
+  background-color: #28a745; 
   border-color: #218838;
 }
 
@@ -70,7 +70,7 @@
 .separator {
   border: none;
   height: 1px;
-  background-color: #1b4f40; /* Darker green */
+  background-color: #1b4f40; 
   margin: 15px 0;
 }
 
@@ -83,11 +83,11 @@
 
 .label {
   font-size: 16px;
-  color: #ffffff; /* White for better contrast */
+  color: #ffffff; 
 }
 
 .select {
-  background-color: #1b4f40; /* Darker green for select box */
+  background-color: #1b4f40;
   color: #ffffff;
   border: 1px solid #444;
   padding: 8px;
