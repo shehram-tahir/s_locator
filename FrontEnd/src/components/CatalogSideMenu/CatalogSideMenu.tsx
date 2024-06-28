@@ -8,12 +8,12 @@ import Loader from "../Loader/Loader";
 import DataContainer from "../DataContainer/DataContainer";
 
 function CatalogSideMenu(props: CatalogSideMenuProps) {
-  const { goBack, onAddClick } = props;
+  const { goBack, setSidebarMode } = props;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<"catalog" | "layer">(
     "layer"
   );
-  const [modalClass, setModalClass] = useState("");
+
 
   const { resetFormStage, isLoading } = useCatalogContext();
 
@@ -23,7 +23,7 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
   }
 
   function closeModal() {
-    resetFormStage();
+    resetFormStage('catalogue');
     setIsModalOpen(false);
   }
 
@@ -35,13 +35,13 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
   ) : modalContent === "catalog" ? (
     <DataContainer
       closeModal={closeModal}
-      handleAddClick={onAddClick}
+      setSidebarMode={setSidebarMode}
       containerType="Catalogue"
     />
   ) : (
     <DataContainer
       closeModal={closeModal}
-      handleAddClick={onAddClick}
+      setSidebarMode={setSidebarMode}
       containerType="Layer"
     />
   );

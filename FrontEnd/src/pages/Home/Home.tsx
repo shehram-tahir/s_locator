@@ -17,7 +17,7 @@ const HomeComponent: React.FC = () => {
       <MapContainer />
       {isModalOpen && (
         <Modal show={isModalOpen} onClose={closeModal} darkBackground={true}>
-          <DataContainer closeModal={closeModal} containerType="Catalogue" />
+          <DataContainer closeModal={closeModal}  />
         </Modal>
       )}
     </div>

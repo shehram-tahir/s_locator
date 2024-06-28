@@ -71,8 +71,12 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     setSaveMethod(method);
   }
 
-  function resetFormStage() {
-    setFormStage("catalogue");
+  function resetFormStage(resetTo: string) {
+    setDescription("")
+    setName("")
+    setIsSaved(false);
+    setIsError(false);
+    setFormStage(resetTo);
   }
 
   return (
@@ -101,6 +105,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         handleAddClick,
         handleSaveClick,
         handleSave,
+
         handleSaveMethodChange,
         resetFormStage,
       }}

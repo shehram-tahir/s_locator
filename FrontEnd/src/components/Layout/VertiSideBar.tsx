@@ -45,11 +45,7 @@ function Layout() {
     setSidebarMode("default");
   }
 
-  function handleAddCatalogClick(id: string, name: string) {
-    handleAddClick(id, name);
-    setFormStage("catalog details");
-    setSidebarMode("catalogDetails");
-  }
+
 
   const sidebarContent =
     sidebarMode === "default" ? (
@@ -66,7 +62,7 @@ function Layout() {
       <div className={styles.CreateCatalogMenu}>
         <CatalogSideMenu
           goBack={goBackToDefaultMenu}
-          onAddClick={handleAddCatalogClick}
+          setSidebarMode={setSidebarMode}
         />
       </div>
     ) : sidebarMode === "catalogDetails" && selectedCatalog ? (

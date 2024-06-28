@@ -1,7 +1,7 @@
 .customSelectContainer {
   position: relative;
   display: inline-block;
-  width: 200px;
+  width: 100%;
 }
 
 .customSelectValue {
@@ -12,6 +12,8 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   justify-content: space-between;
+  position: relative;
+  background-color: #f9f9f9;
 }
 
 .colorCircle {
@@ -19,6 +21,8 @@
   height: 12px;
   border-radius: 50%;
   margin-left: 8px;
+  position: absolute;
+  left: 70px;
 }
 
 .arrowIcon {

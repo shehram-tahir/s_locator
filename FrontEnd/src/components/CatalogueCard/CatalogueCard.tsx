@@ -11,21 +11,18 @@ function CatalogueCard(props: CatalogueCardProps) {
     records_number,
     can_access,
     onMoreInfo,
-    containerType,
-    handleAddClick,
+    containerType ,
   } = props;
 
   // Handle add button click
-  function handleAdd() {
-    handleAddClick(id, name);
-  }
+  
 
   function renderActionItems() {
     if (containerType) {
       return (
         <li className={styles.actionItem}>
           <div
-            onClick={handleAdd}
+            onClick={onMoreInfo}
             className={`${styles.moreInfo} ${styles.add}`}
           >
             + Add

@@ -32,16 +32,16 @@ export interface DataContainerProps {
   closeModal(): void;
   isFromAddCatalogue?: boolean;
   isFromAddLayer?: boolean;
-  handleAddClick?(id: string, name: string): void;
-  containerType: "Catalogue" | "Layer";
+  containerType?: string | undefined;
+  setSidebarMode?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface DefaultMenuProps {
   isMenuExpanded: boolean;
   isViewClicked: boolean;
-  handleViewClick: () => void;
-  openLayerModal: () => void;
-  setSidebarMode: (mode: string) => void;
+  handleViewClick(): void;
+  openLayerModal():  void;
+  setSidebarMode(mode: string): void;
 }
 
 export interface Catalog {
@@ -63,12 +63,11 @@ export interface CatalogueCardProps {
   can_access: boolean;
   onMoreInfo(): void;
   containerType: string;
-  handleAddClick(id: string, name: string): void;
 }
 
 export interface CatalogSideMenuProps {
   goBack(): void;
-  onAddClick(id: string, name: string): void;
+  setSidebarMode:React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Create Catalog Interfaces
@@ -111,7 +110,7 @@ export interface CatalogContextType {
   handleSaveClick(): void;
   handleSave(): void;
   handleSaveMethodChange(method: string): void;
-  resetFormStage(): void;
+  resetFormStage(resetTo: string): void; 
 }
 
 // Layer Context Types

@@ -75,6 +75,7 @@ export function LayerProvider(props: { children: ReactNode }) {
   function resetFormStage() {
     setIsSaved(false);
     setIsError(false);
+    
     setFormStage("initial");
   }
 

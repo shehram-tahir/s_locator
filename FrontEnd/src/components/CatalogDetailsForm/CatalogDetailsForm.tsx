@@ -23,6 +23,7 @@ function CatalogDetailsForm(props: CatalogDetailsProps) {
     isSaved,
     isError,
     handleSaveMethodChange,
+    resetFormStage
   } = useCatalogContext();
 
   const [error, setError] = useState<string | null>(null);
@@ -40,12 +41,12 @@ function CatalogDetailsForm(props: CatalogDetailsProps) {
   function handleButtonClick() {
     if (validateForm()) {
       setIsModalOpen(true);
-      handleSave();
     }
   }
 
   function handleCloseModal() {
     setIsModalOpen(false);
+    resetFormStage('default')
     goBackToDefaultMenu();
   }
 
