@@ -7,17 +7,40 @@ function ColorSelect(props: ColorSelectProps) {
   const { options, value, onChange } = props;
   const [isOpen, setIsOpen] = useState(false);
 
+  // Handle option click and pass the selected value to the parent component
   function handleOptionClick(option: string) {
     onChange(option);
     setIsOpen(false);
   }
 
+  function toggleDropdown() {
+    setIsOpen(!isOpen);
+  }
+
+  // Render the select options
+  function renderOptions() {
+    return options.map(function (option) {
+      return (
+        <div
+          key={option}
+          className={styles.customSelectOption}
+          onClick={function () {
+            handleOptionClick(option);
+          }}
+        >
+          <span className={styles.optionText}>{option}</span>
+          <span
+            className={styles.colorCircle}
+            style={{ backgroundColor: option.toLowerCase() }}
+          />
+        </div>
+      );
+    });
+  }
+
   return (
     <div className={styles.customSelectContainer}>
-      <div
-        className={styles.customSelectValue}
-        onClick={() => setIsOpen(!isOpen)}
-      >
+      <div className={styles.customSelectValue} onClick={toggleDropdown}>
         <span className={value ? styles.selectedText : styles.placeholder}>
           {value || "Select a color"}
         </span>
@@ -30,21 +53,7 @@ function ColorSelect(props: ColorSelectProps) {
         />
       </div>
       {isOpen && (
-        <div className={styles.customSelectOptions}>
-          {options.map((option) => (
-            <div
-              key={option}
-              className={styles.customSelectOption}
-              onClick={() => handleOptionClick(option)}
-            >
-              <span className={styles.optionText}>{option}</span>
-              <span
-                className={styles.colorCircle}
-                style={{ backgroundColor: option.toLowerCase() }}
-              />
-            </div>
-          ))}
-        </div>
+        <div className={styles.customSelectOptions}>{renderOptions()}</div>
       )}
     </div>
   );

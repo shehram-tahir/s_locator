@@ -4,8 +4,7 @@ import { CatalogContextType } from "../types/allTypesAndInterfaces";
 
 const CatalogContext = createContext<CatalogContextType | undefined>(undefined);
 
-export function CatalogProvider(props: { children: ReactNode }) {
-  const { children } = props;
+export function CatalogProvider({ children }: { children: ReactNode }) {
   const [formStage, setFormStage] = useState("catalogue");
   const [saveMethod, setSaveMethod] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +20,8 @@ export function CatalogProvider(props: { children: ReactNode }) {
   const [name, setName] = useState("");
 
   function handleAddClick(id: string, name: string) {
+    // Fetch the chosen catalog or layer to pre-populate the description and price
+
     console.log(`Adding catalogue with ID: ${id} and Name: ${name}`);
     setIsLoading(true);
 
@@ -54,31 +55,20 @@ export function CatalogProvider(props: { children: ReactNode }) {
 
     console.log("Saving data:", saveData);
 
-    setFormStage("loading");
     setIsLoading(true);
     setTimeout(function () {
       console.log("API call to save the data:", saveData);
       setIsLoading(false);
       if (true) {
         setIsSaved(true);
-        setFormStage("saved");
       } else {
         setIsError(true);
-        setFormStage("error");
       }
     }, 2000);
   }
 
   function handleSaveMethodChange(method: string) {
     setSaveMethod(method);
-  }
-
-  function handleDescriptionChange(desc: string) {
-    setDescription(desc);
-  }
-
-  function handleNameChange(name: string) {
-    setName(name);
   }
 
   function resetFormStage() {
@@ -112,8 +102,6 @@ export function CatalogProvider(props: { children: ReactNode }) {
         handleSaveClick,
         handleSave,
         handleSaveMethodChange,
-        handleDescriptionChange,
-        handleNameChange,
         resetFormStage,
       }}
     >

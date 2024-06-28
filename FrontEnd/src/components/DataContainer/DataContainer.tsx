@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from "react";
 import CatalogueCard from "../CatalogueCard/CatalogueCard";
 import styles from "./DataContainer.module.css";
-import { CatalogueContainerProps } from "../../types/allTypesAndInterfaces";
+import { DataContainerProps } from "../../types/allTypesAndInterfaces";
 import { HttpReq } from "../../services/apiService";
 import urls from "../../urls.json";
 import { Catalog } from "../../types/allTypesAndInterfaces";
 import { useNavigate } from "react-router-dom";
 
-interface DataContainerProps extends CatalogueContainerProps {
-  containerType: "Catalogue" | "Layer";
-}
 
-const DataContainer: React.FC<DataContainerProps> = ({
-  closeModal,
-  isFromAddCatalogue = false,
-  isFromAddLayer = false,
-  handleAddClick,
-  containerType,
-}) => {
+
+function DataContainer(props: DataContainerProps) {
+  const { closeModal, handleAddClick, containerType } = props;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(
     containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"
@@ -29,7 +22,7 @@ const DataContainer: React.FC<DataContainerProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
+  function fetchData() {
     const endpoint =
       containerType === "Catalogue"
         ? urls.catlog_collection
@@ -43,7 +36,37 @@ const DataContainer: React.FC<DataContainerProps> = ({
       setLoading,
       setError
     );
-  }, [containerType]);
+  }
+
+  useEffect(fetchData, [containerType]);
+
+  function handleCatalogCardClick(selectedCatalog: Catalog) {
+    const queryParams =
+      containerType === "Catalogue"
+        ? `?catalogue_dataset_id=${selectedCatalog.id}`
+        : `?layer_dataset_id=${selectedCatalog.id}`;
+    navigate(`${queryParams}`, { replace: true });
+    closeModal();
+  }
+
+  function makeCard(item: Catalog) {
+    return (
+      <CatalogueCard
+        key={item.id}
+        id={item.id}
+        thumbnail_url={item.thumbnail_url}
+        name={item.name}
+        records_number={item.records_number}
+        description={item.description}
+        onMoreInfo={function () {
+          handleCatalogCardClick(item);
+        }}
+        can_access={item.can_access}
+        handleAddClick={handleAddClick ? handleAddClick : function () {}}
+        containerType={containerType}
+      />
+    );
+  }
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -57,31 +80,6 @@ const DataContainer: React.FC<DataContainerProps> = ({
     return <div>{resData}</div>;
   }
 
-  const handleCatalogCardClick = (selectedCatalog: Catalog) => {
-    const queryParams =
-      containerType === "Catalogue"
-        ? `?catalogue_dataset_id=${selectedCatalog.id}`
-        : `?layer_dataset_id=${selectedCatalog.id}`;
-    navigate(`${queryParams}`, { replace: true });
-    closeModal();
-  };
-
-  const make_card = (item: Catalog) => (
-    <CatalogueCard
-      key={item.id}
-      id={item.id}
-      thumbnail_url={item.thumbnail_url}
-      name={item.name}
-      records_number={item.records_number}
-      description={item.description}
-      onMoreInfo={() => handleCatalogCardClick(item)}
-      can_access={item.can_access}
-      isFromAddCatalogue={isFromAddCatalogue}
-      isFromAddLayer={isFromAddLayer}
-      handleAddClick={handleAddClick ? handleAddClick : () => {}}
-    />
-  );
-
   return (
     <div className={styles.dataContainer}>
       <h2 className={styles.dataHeading}>
@@ -89,44 +87,46 @@ const DataContainer: React.FC<DataContainerProps> = ({
           ? "Add Data to Map"
           : "Add Layers to Map"}
       </h2>
-      {(isFromAddCatalogue || isFromAddLayer) && (
-        <div className={styles.tabMenu}>
-          <button
-            className={
-              activeTab === "Data Catalogue" || activeTab === "Data Layer"
-                ? styles.activeTab
-                : styles.tabButton
-            }
-            onClick={() =>
-              setActiveTab(
-                containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"
-              )
-            }
-          >
-            {containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"}
-          </button>
-          <button
-            className={
-              activeTab === "Load Files" ? styles.activeTab : styles.tabButton
-            }
-            onClick={() => setActiveTab("Load Files")}
-          >
-            Load Files
-          </button>
-          <button
-            className={
-              activeTab === "Connect Your Data"
-                ? styles.activeTab
-                : styles.tabButton
-            }
-            onClick={() => setActiveTab("Connect Your Data")}
-          >
-            Connect Your Data
-          </button>
-        </div>
-      )}
+      <div className={styles.tabMenu}>
+        <button
+          className={
+            activeTab === "Data Catalogue" || activeTab === "Data Layer"
+              ? styles.activeTab
+              : styles.tabButton
+          }
+          onClick={function () {
+            setActiveTab(
+              containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"
+            );
+          }}
+        >
+          {containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"}
+        </button>
+        <button
+          className={
+            activeTab === "Load Files" ? styles.activeTab : styles.tabButton
+          }
+          onClick={function () {
+            setActiveTab("Load Files");
+          }}
+        >
+          Load Files
+        </button>
+        <button
+          className={
+            activeTab === "Connect Your Data"
+              ? styles.activeTab
+              : styles.tabButton
+          }
+          onClick={function () {
+            setActiveTab("Connect Your Data");
+          }}
+        >
+          Connect Your Data
+        </button>
+      </div>
       {activeTab === "Data Catalogue" || activeTab === "Data Layer" ? (
-        <div className={styles.dataGrid}>{resData.map(make_card)}</div>
+        <div className={styles.dataGrid}>{resData.map(makeCard)}</div>
       ) : activeTab === "Load Files" ? (
         <div className={styles.placeholderContent}>Load Files Content</div>
       ) : (
@@ -136,6 +136,6 @@ const DataContainer: React.FC<DataContainerProps> = ({
       )}
     </div>
   );
-};
+}
 
 export default DataContainer;

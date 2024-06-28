@@ -16,7 +16,7 @@ const HomeComponent: React.FC = () => {
     <div className={styles.content}>
       <MapContainer />
       {isModalOpen && (
-        <Modal show={isModalOpen} onClose={closeModal} homePageModal={true}>
+        <Modal show={isModalOpen} onClose={closeModal} darkBackground={true}>
           <DataContainer closeModal={closeModal} containerType="Catalogue" />
         </Modal>
       )}

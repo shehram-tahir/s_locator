@@ -8,29 +8,25 @@ function Modal(props: ModalProps) {
     show,
     onClose,
     children,
-    modalClass = "",
-    homePageModal = false,
+    darkBackground = false,
+    isSmaller = false,
   } = props;
 
   if (!show) {
     return null;
   }
 
-  let combinedClassNames = `${styles.modalContent}`;
-
-  if (modalClass === "smallerContainer") {
-    combinedClassNames += ` ${styles.smallerContainer}`;
-  } else if (modalClass === "smallerContainerv2") {
-    combinedClassNames += ` ${styles.smallerContainerv2}`;
-  }
-
   return ReactDOM.createPortal(
     <div
       className={`${styles.modalOverlay} ${
-        homePageModal ? styles.modalOverlayFirstLoad : ""
+        darkBackground ? styles.darkBackground : ""
       }`}
     >
-      <div className={combinedClassNames}>
+      <div
+        className={`${styles.modalContent} ${
+          isSmaller ? styles.smallerContainer : ""
+        }`}
+      >
         <button
           className={styles.closeButton}
           onClick={onClose}

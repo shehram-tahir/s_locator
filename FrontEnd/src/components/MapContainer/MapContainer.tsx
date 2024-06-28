@@ -85,11 +85,14 @@ const MapContainer: React.FC = () => {
     [catalogueDatasetId]
   );
 
-  useEffect(() => {
+useEffect(
+  function () {
     if (firstFormResponse) {
       setGeoPoints(firstFormResponse as string);
     }
-  }, [firstFormResponse]);
+  },
+  [firstFormResponse]
+);
 
   // useEffect(function () {
   //   if (typeof geoPoints !== 'string') {

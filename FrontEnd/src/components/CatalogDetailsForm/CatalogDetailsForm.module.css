@@ -112,9 +112,3 @@
   color: #333;
 }
 
-.loaderContainer{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}

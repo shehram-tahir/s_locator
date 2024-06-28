@@ -1,30 +1,92 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./CatalogueCard.module.css";
-import Loader from "../Loader/Loader";
-import {CatalogueCardProps} from "../../types/allTypesAndInterfaces"
+import { CatalogueCardProps } from "../../types/allTypesAndInterfaces";
 
+function CatalogueCard(props: CatalogueCardProps) {
+  const {
+    id,
+    name,
+    description,
+    thumbnail_url,
+    records_number,
+    can_access,
+    onMoreInfo,
+    containerType,
+    handleAddClick,
+  } = props;
 
-const CatalogueCard: React.FC<CatalogueCardProps> = ({
-  id,
-  name,
-  description,
-  thumbnail_url,
-  records_number,
-  can_access,
-  onMoreInfo,
-  isFromAddCatalogue,
-  isFromAddLayer,
-  handleAddClick,
-}) => {
-  const [isAdding, setIsAdding] = useState(false);
-
-  const handleAdd = () => {
-    setIsAdding(true);
+  // Handle add button click
+  function handleAdd() {
     handleAddClick(id, name);
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 1000); 
-  };
+  }
+
+  function renderActionItems() {
+    if (containerType) {
+      return (
+        <li className={styles.actionItem}>
+          <div
+            onClick={handleAdd}
+            className={`${styles.moreInfo} ${styles.add}`}
+          >
+            + Add
+          </div>
+        </li>
+      );
+    } else {
+      return (
+        <>
+          <li className={styles.actionItem}>
+            <div onClick={onMoreInfo} className={styles.moreInfo}>
+              Load Data
+            </div>
+            <span
+              role="img"
+              aria-label="info-circle"
+              className="anticon anticon-info-circle"
+            >
+              <svg
+                viewBox="64 64 896 896"
+                focusable="false"
+                data-icon="info-circle"
+                width="1em"
+                height="1em"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path>
+                <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"></path>
+              </svg>
+            </span>
+          </li>
+          {!can_access && (
+            <li className={styles.actionItem}>
+              <div onClick={onMoreInfo} className={styles.moreInfo}>
+                Request Access
+              </div>
+              <span
+                role="img"
+                aria-label="info-circle"
+                className="anticon anticon-info-circle"
+              >
+                <svg
+                  viewBox="64 64 896 896"
+                  focusable="false"
+                  data-icon="info-circle"
+                  width="1em"
+                  height="1em"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372-166.6 372 372-166.6 372-372 372z"></path>
+                  <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"></path>
+                </svg>
+              </span>
+            </li>
+          )}
+        </>
+      );
+    }
+  }
 
   return (
     <div className={styles.catalogueWrapper}>
@@ -48,76 +110,10 @@ const CatalogueCard: React.FC<CatalogueCardProps> = ({
             <p className={styles.catalogueDesc}>{description}</p>
           </div>
         </div>
-        <ul className={styles.cardActions}>
-          {isFromAddCatalogue || isFromAddLayer ? (
-            <li className={styles.actionItem}>
-              {isAdding ? (
-                <Loader />
-              ) : (
-                <div
-                  onClick={handleAdd}
-                  className={`${styles.moreInfo} ${styles.add}`}
-                >
-                  + Add
-                </div>
-              )}
-            </li>
-          ) : (
-            <>
-              <li className={styles.actionItem}>
-                <div onClick={onMoreInfo} className={styles.moreInfo}>
-                  Load Data
-                </div>
-                <span
-                  role="img"
-                  aria-label="info-circle"
-                  className="anticon anticon-info-circle"
-                >
-                  <svg
-                    viewBox="64 64 896 896"
-                    focusable="false"
-                    data-icon="info-circle"
-                    width="1em"
-                    height="1em"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path>
-                    <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"></path>
-                  </svg>
-                </span>
-              </li>
-              {!can_access && (
-                <li className={styles.actionItem}>
-                  <div onClick={onMoreInfo} className={styles.moreInfo}>
-                    Request Access
-                  </div>
-                  <span
-                    role="img"
-                    aria-label="info-circle"
-                    className="anticon anticon-info-circle"
-                  >
-                    <svg
-                      viewBox="64 64 896 896"
-                      focusable="false"
-                      data-icon="info-circle"
-                      width="1em"
-                      height="1em"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path>
-                      <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"></path>
-                    </svg>
-                  </span>
-                </li>
-              )}
-            </>
-          )}
-        </ul>
+        <ul className={styles.cardActions}>{renderActionItems()}</ul>
       </div>
     </div>
   );
-};
+}
 
 export default CatalogueCard;

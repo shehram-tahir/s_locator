@@ -3,22 +3,17 @@ import { Link } from "react-router-dom";
 import { MdInfo, MdMap, MdTableChart, MdFactory } from "react-icons/md";
 import { FaLayerGroup, FaBoxOpen } from "react-icons/fa";
 import styles from "./DefaultMenu.module.css";
+import { DefaultMenuProps } from "../../types/allTypesAndInterfaces";
 
-interface DefaultMenuProps {
-  isMenuExpanded: boolean;
-  isViewClicked: boolean;
-  handleViewClick: () => void;
-  openLayerModal: () => void;
-  setSidebarMode: (mode: string) => void;
-}
+function DefaultMenu(props: DefaultMenuProps) {
+  const {
+    isMenuExpanded,
+    isViewClicked,
+    handleViewClick,
+    openLayerModal,
+    setSidebarMode,
+  } = props;
 
-const DefaultMenu: React.FC<DefaultMenuProps> = ({
-  isMenuExpanded,
-  isViewClicked,
-  handleViewClick,
-  openLayerModal,
-  setSidebarMode,
-}) => {
   return (
     <ul className={styles.menuList}>
       <li>
@@ -55,7 +50,9 @@ const DefaultMenu: React.FC<DefaultMenuProps> = ({
           </li>
           <li>
             <div
-              onClick={() => setSidebarMode("catalog")}
+              onClick={function () {
+                setSidebarMode("catalog");
+              }}
               className={styles.iconContainer}
             >
               <FaBoxOpen className={styles.icon} />
@@ -66,6 +63,6 @@ const DefaultMenu: React.FC<DefaultMenuProps> = ({
       )}
     </ul>
   );
-};
+}
 
 export default DefaultMenu;

@@ -1,39 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import styles from "./CustomizeLayer.module.css";
-import ColorSelect from "../ColorSelect/ColorSelect"; // Make sure the path is correct
-import { CustomizeLayerProps } from "../../types/allTypesAndInterfaces";
+import ColorSelect from "../ColorSelect/ColorSelect";
+import { useLayerContext } from "../../context/LayerContext";
+
+interface CustomizeLayerProps {
+  closeModal: Function;
+}
 
 function CustomizeLayer(props: CustomizeLayerProps) {
-  const {
-    pointColor,
-    legend,
-    description,
-    name,
-    handleColorChange,
-    handleLegendChange,
-    handleDescriptionChange,
-    handleNameChange,
-    handleNextStep,
-    closeModal,
-  } = props;
+  const { closeModal } = props;
+  const { setSecondFormData, handleNextStep } = useLayerContext();
+
+  const [pointColor, setPointColor] = useState<string>("");
+  const [legend, setLegend] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
   const [error, setError] = useState<string | null>(null);
   const colorOptions = ["Red", "Green", "Blue", "Yellow", "Black"];
 
-  const validateForm = () => {
+  function handleColorChange(color: string): void {
+    setPointColor(color);
+  }
+
+  function handleSecondFormChange(
+    event: ChangeEvent<
+      HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement
+    >
+  ): void {
+    const { name, value } = event.target;
+    switch (name) {
+      case "name":
+        setName(value);
+        break;
+      case "legend":
+        setLegend(value);
+        break;
+      case "description":
+        setDescription(value);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function validateForm(): boolean {
     if (!name || !pointColor || !legend || !description) {
       setError("All fields are required.");
       return false;
     }
     setError(null);
     return true;
-  };
+  }
 
-  const handleButtonClick = () => {
+  function handleButtonClick(): void {
     if (validateForm()) {
+      setSecondFormData({ pointColor, legend, description, name });
       handleNextStep();
     }
-  };
+  }
 
   return (
     <div className={styles.container}>
@@ -47,7 +72,7 @@ function CustomizeLayer(props: CustomizeLayerProps) {
           name="name"
           className={styles.input}
           value={name}
-          onChange={handleNameChange}
+          onChange={handleSecondFormChange}
         />
       </div>
       <div className={styles.formGroup}>
@@ -70,7 +95,7 @@ function CustomizeLayer(props: CustomizeLayerProps) {
           className={styles.textarea}
           rows={3}
           value={legend}
-          onChange={handleLegendChange}
+          onChange={handleSecondFormChange}
         />
       </div>
       <div className={styles.formGroup}>
@@ -83,12 +108,12 @@ function CustomizeLayer(props: CustomizeLayerProps) {
           className={`${styles.textarea} ${styles.description}`}
           rows={5}
           value={description}
-          onChange={handleDescriptionChange}
+          onChange={handleSecondFormChange}
         />
       </div>
       {error && <p className={styles.error}>{error}</p>}
       <div className={styles.buttonContainer}>
-        <button className={styles.button} onClick={closeModal}>
+        <button className={styles.button} onClick={closeModal as any}>
           Discard
         </button>
         <button className={styles.button} onClick={handleButtonClick}>

@@ -1,4 +1,3 @@
-// src/components/Layout/Layout.tsx
 import React, { useState, ReactNode } from "react";
 import { Routes, Route } from "react-router-dom";
 import styles from "./VertiSideBar.module.css";
@@ -21,18 +20,7 @@ function Layout() {
   const [modalContent, setModalContent] = useState<ReactNode | null>(null);
   const [sidebarMode, setSidebarMode] = useState("default");
   const { resetFormStage } = useLayerContext();
-  const {
-    handleAddClick,
-    setFormStage,
-    selectedCatalog,
-    legendList,
-    subscriptionPrice,
-    description,
-    name,
-    handleDescriptionChange,
-    handleNameChange,
-    handleSaveClick,
-  } = useCatalogContext();
+  const { handleAddClick, setFormStage, selectedCatalog } = useCatalogContext();
 
   function toggleMenu() {
     setIsMenuExpanded(!isMenuExpanded);
@@ -63,43 +51,33 @@ function Layout() {
     setSidebarMode("catalogDetails");
   }
 
+  const sidebarContent =
+    sidebarMode === "default" ? (
+      <ExpandableMenu isExpanded={isMenuExpanded} toggleMenu={toggleMenu}>
+        <DefaultMenu
+          isMenuExpanded={isMenuExpanded}
+          isViewClicked={isViewClicked}
+          handleViewClick={handleViewClick}
+          openLayerModal={openLayerModal}
+          setSidebarMode={setSidebarMode}
+        />
+      </ExpandableMenu>
+    ) : sidebarMode === "catalog" ? (
+      <div className={styles.CreateCatalogMenu}>
+        <CatalogSideMenu
+          goBack={goBackToDefaultMenu}
+          onAddClick={handleAddCatalogClick}
+        />
+      </div>
+    ) : sidebarMode === "catalogDetails" && selectedCatalog ? (
+      <div className={styles.CreateCatalogMenu}>
+        <CatalogDetailsForm goBackToDefaultMenu={goBackToDefaultMenu} />
+      </div>
+    ) : null;
+
   return (
     <div className={styles.layout}>
-      {sidebarMode === "default" ? (
-        <ExpandableMenu isExpanded={isMenuExpanded} toggleMenu={toggleMenu}>
-          <DefaultMenu
-            isMenuExpanded={isMenuExpanded}
-            isViewClicked={isViewClicked}
-            handleViewClick={handleViewClick}
-            openLayerModal={openLayerModal}
-            setSidebarMode={setSidebarMode}
-          />
-        </ExpandableMenu>
-      ) : (
-        <div className={styles.CreateCatalogMenu}>
-          {sidebarMode === "catalog" ? (
-            <CatalogSideMenu
-              goBack={goBackToDefaultMenu}
-              onAddClick={handleAddCatalogClick}
-            />
-          ) : (
-            sidebarMode === "catalogDetails" &&
-            selectedCatalog && (
-              <CatalogDetailsForm
-                handleSaveClick={handleSaveClick}
-                selectedCatalog={selectedCatalog}
-                legendList={legendList}
-                subscriptionPrice={subscriptionPrice}
-                description={description}
-                name={name}
-                handleDescriptionChange={handleDescriptionChange}
-                handleNameChange={handleNameChange}
-                goBackToDefaultMenu={goBackToDefaultMenu}
-              />
-            )
-          )}
-        </div>
-      )}
+      {sidebarContent}
       <div className={styles.content}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -110,7 +88,7 @@ function Layout() {
       <Modal
         show={isModalOpen}
         onClose={closeModal}
-        modalClass={"smallerContainer"}
+        isSmaller={true}
       >
         {modalContent}
       </Modal>

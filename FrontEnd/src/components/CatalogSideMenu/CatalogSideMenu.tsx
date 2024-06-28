@@ -1,4 +1,3 @@
-// src/components/CatalogSideMenu/CatalogSideMenu.tsx
 import React, { useState } from "react";
 import styles from "./CatalogSideMenu.module.css";
 import { MdLayers, MdArrowBackIos } from "react-icons/md";
@@ -6,7 +5,6 @@ import Modal from "../Modal/Modal";
 import { CatalogSideMenuProps } from "../../types/allTypesAndInterfaces";
 import { useCatalogContext } from "../../context/CatalogContext";
 import Loader from "../Loader/Loader";
-
 import DataContainer from "../DataContainer/DataContainer";
 
 function CatalogSideMenu(props: CatalogSideMenuProps) {
@@ -29,6 +27,25 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
     setIsModalOpen(false);
   }
 
+  // Modal content based on the state
+  const modalContentElement = isLoading ? (
+    <div className={styles.loaderContainer}>
+      <Loader />
+    </div>
+  ) : modalContent === "catalog" ? (
+    <DataContainer
+      closeModal={closeModal}
+      handleAddClick={onAddClick}
+      containerType="Catalogue"
+    />
+  ) : (
+    <DataContainer
+      closeModal={closeModal}
+      handleAddClick={onAddClick}
+      containerType="Layer"
+    />
+  );
+
   return (
     <>
       <nav className={styles.nav}>
@@ -39,7 +56,9 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
         <p className={styles.sectionTitle}>Datasets</p>
         <button
           className={`${styles.addButton} ${styles.addDataButton}`}
-          onClick={() => openModal("catalog")}
+          onClick={function () {
+            openModal("catalog");
+          }}
         >
           + Add Catalog
         </button>
@@ -48,7 +67,9 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
         <p className={styles.sectionTitle}>Layers</p>
         <button
           className={`${styles.addButton} ${styles.addLayerButton}`}
-          onClick={() => openModal("layer")}
+          onClick={function () {
+            openModal("layer");
+          }}
         >
           + Add Layer
         </button>
@@ -64,26 +85,8 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
         </select>
       </div>
       {isModalOpen && (
-        <Modal show={isModalOpen} onClose={closeModal} modalClass={modalClass}>
-          {isLoading ? (
-            <div className={styles.loaderContainer}>
-              <Loader />
-            </div>
-          ) : modalContent === "catalog" ? (
-            <DataContainer
-              closeModal={closeModal}
-              isFromAddCatalogue={true}
-              handleAddClick={onAddClick}
-              containerType="Catalogue"
-            />
-          ) : (
-            <DataContainer
-              closeModal={closeModal}
-              isFromAddLayer={true}
-              handleAddClick={onAddClick}
-              containerType="Layer"
-            />
-          )}
+        <Modal show={isModalOpen} onClose={closeModal} >
+          {modalContentElement}
         </Modal>
       )}
     </>
