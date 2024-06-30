@@ -3,7 +3,7 @@ from all_types.myapi_dtypes import MapData
 
 class MapBoxConnector:
     @classmethod
-    async def ggl_to_boxmap(self, businesses_response: GglResponse) -> MapData:
+    async def ggl_to_boxmap(self, businesses_response) -> MapData:
         features = []
 
         for business in businesses_response:
@@ -37,23 +37,24 @@ class MapBoxConnector:
         return business_data.model_dump()
 
     @classmethod
-    async def new_ggl_to_boxmap(self, businesses_response: GglResponse) -> MapData:
+    async def new_ggl_to_boxmap(self, ggl_api_resp) -> MapData:
         features = []
 
-        for business in businesses_response:
-            lng = business.get('location', {}).get('longitude', 0)
-            lat = business.get('location', {}).get('latitude', 0)
+        for place in ggl_api_resp:
+            lng = place.get('location', {}).get('longitude', 0)
+            lat = place.get('location', {}).get('latitude', 0)
 
             feature = {
                 'type': 'Feature',
                 'properties': {
-                    'name': business.get('displayName', '').get("text",""),
-                    'rating': business.get('rating', ''),
-                    'address': business.get('formattedAddress', ''),
-                    'phone': business.get('internationalPhoneNumber', business.get('nationalPhoneNumber', '')),
-                    'website': business.get('websiteUri', ''),
-                    'business_status': business.get('businessStatus', ''),
-                    'user_ratings_total': business.get('userRatingCount', '')
+                    'name': place.get('displayName', '').get("text",""),
+                    'rating': place.get('rating', ''),
+                    'address': place.get('formattedAddress', ''),
+                    'phone': place.get('internationalPhoneNumber',""),
+                    'types': place.get('types', ''),
+                    'priceLevel': place.get('priceLevel', ''),
+                    'primaryType': place.get('primaryType', ''),
+                    'user_ratings_total': place.get('userRatingCount', '')
                 },
                 'geometry': {
                     'type': 'Point',

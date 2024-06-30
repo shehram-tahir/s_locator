@@ -84,4 +84,4 @@ class CountryCityData(BaseModel):
 
 
 class NearbyCategories(ResDefault):
-    data: List[str]
+    data: Dict[str, List[str]]

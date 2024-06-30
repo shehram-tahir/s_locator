@@ -4,7 +4,6 @@
 
 pc_venv/
 .idea/
-/.vscode/
 **/.env
 
 

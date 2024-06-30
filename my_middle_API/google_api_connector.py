@@ -40,7 +40,7 @@ async def fetch_from_google_maps_api(req: LocationReq):
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": CONF.api_key,
-        "X-Goog-FieldMask": "*"
+        "X-Goog-FieldMask": CONF.google_fields
     }
 
     data = {
