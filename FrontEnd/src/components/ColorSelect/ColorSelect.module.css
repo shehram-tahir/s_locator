@@ -1,0 +1,74 @@
+.customSelectContainer {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.customSelectValue {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  justify-content: space-between;
+  position: relative;
+  background-color: #f9f9f9;
+}
+
+.colorCircle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 8px;
+  position: absolute;
+  left: 70px;
+}
+
+.arrowIcon {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.arrowIcon.open {
+  transform: rotate(180deg);
+}
+
+.customSelectOptions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.customSelectOption {
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s ease;
+}
+
+.customSelectOption:hover {
+  background-color: #f0f0f0;
+}
+
+.placeholder {
+  color: #999;
+}
+
+.selectedText {
+  color: #333;
+}
+
+.optionText {
+  flex-grow: 1;
+}

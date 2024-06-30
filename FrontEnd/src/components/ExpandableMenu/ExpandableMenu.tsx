@@ -1,31 +1,24 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import styles from "./ExpandableMenu.module.css";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import { useUIContext } from "../../context/UIContext";
+import { ExpandableMenuProps } from "../../types/allTypesAndInterfaces";
 
-interface ExpandableMenuProps {
-  isExpanded: boolean;
-  toggleMenu: () => void;
-  children?: React.ReactNode;
-}
+function ExpandableMenu({ children }: ExpandableMenuProps) {
+  const { isMenuExpanded, toggleMenu } = useUIContext();
 
-const ExpandableMenu: React.FC<ExpandableMenuProps> = ({
-  isExpanded,
-  toggleMenu,
-  children,
-}) => {
   return (
-    <div className={`${styles.menu} ${isExpanded ? styles.expanded : ""}`}>
+    <div className={`${styles.menu} ${isMenuExpanded ? styles.expanded : ""}`}>
       <button onClick={toggleMenu} className={styles.toggleButton}>
-        {isExpanded ? (
+        {isMenuExpanded ? (
           <MdExpandLess className={styles.icon} />
         ) : (
           <MdExpandMore className={styles.icon} />
         )}
       </button>
-
       <div className={styles.menuItems}>{children}</div>
     </div>
   );
-};
+}
 
 export default ExpandableMenu;
