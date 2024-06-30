@@ -1,27 +1,35 @@
-// src/pages/Home/Home.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import styles from "./Home.module.css";
 import MapContainer from "../../components/MapContainer/MapContainer";
-import Modal from '../../components/Modal/Modal';
-import DataContainer from '../../components/DataContainer/DataContainer';
+import DataContainer from "../../components/DataContainer/DataContainer";
+import { useUIContext } from "../../context/UIContext";
 
-const HomeComponent: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+function HomeComponent() {
+  const { openModal } = useUIContext();
+  const [hasOpened, setHasOpened] = useState(false);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  // useEffect is used to open the modal only once when the component mounts.
+  // The effect checks if the modal has already been opened using the `hasOpened` state.
+  // If not, it opens the modal with the `DataContainer` component as content and sets `hasOpened` to true.
+  // This ensures the modal opens only once and doesn't reopen on subsequent renders.
+
+  useEffect(
+    function () {
+      if (!hasOpened) {
+        openModal(<DataContainer />, {
+          darkBackground: true,
+        });
+        setHasOpened(true);
+      }
+    },
+    [hasOpened, openModal]
+  );
 
   return (
     <div className={styles.content}>
       <MapContainer />
-      {isModalOpen && (
-        <Modal show={isModalOpen} onClose={closeModal} darkBackground={true}>
-          <DataContainer closeModal={closeModal}  />
-        </Modal>
-      )}
     </div>
   );
-};
+}
 
 export default HomeComponent;

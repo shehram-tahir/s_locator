@@ -2,32 +2,28 @@ import React, { useState, ChangeEvent } from "react";
 import styles from "./CustomizeLayer.module.css";
 import ColorSelect from "../ColorSelect/ColorSelect";
 import { useLayerContext } from "../../context/LayerContext";
+import { useUIContext } from "../../context/UIContext";
 
-interface CustomizeLayerProps {
-  closeModal: Function;
-}
+function CustomizeLayer() {
+  const {
+    setSecondFormData,
+    handleNextStep,
+    resetFormStage,
+    selectedColor,
+    setSelectedColor,
+  } = useLayerContext();
+  const { closeModal } = useUIContext();
 
-function CustomizeLayer(props: CustomizeLayerProps) {
-  const { closeModal } = props;
-  const { setSecondFormData, handleNextStep } = useLayerContext();
-
-  const [pointColor, setPointColor] = useState<string>("");
   const [legend, setLegend] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [name, setName] = useState<string>("");
-
   const [error, setError] = useState<string | null>(null);
-  const colorOptions = ["Red", "Green", "Blue", "Yellow", "Black"];
-
-  function handleColorChange(color: string): void {
-    setPointColor(color);
-  }
 
   function handleSecondFormChange(
     event: ChangeEvent<
       HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement
     >
-  ): void {
+  ) {
     const { name, value } = event.target;
     switch (name) {
       case "name":
@@ -44,8 +40,8 @@ function CustomizeLayer(props: CustomizeLayerProps) {
     }
   }
 
-  function validateForm(): boolean {
-    if (!name || !pointColor || !legend || !description) {
+  function validateForm() {
+    if (!name || !selectedColor || !legend || !description) {
       setError("All fields are required.");
       return false;
     }
@@ -53,11 +49,22 @@ function CustomizeLayer(props: CustomizeLayerProps) {
     return true;
   }
 
-  function handleButtonClick(): void {
+  function handleButtonClick() {
     if (validateForm()) {
-      setSecondFormData({ pointColor, legend, description, name });
+      setSecondFormData({
+        pointColor: selectedColor,
+        legend,
+        description,
+        name,
+      });
+      setSelectedColor("");
       handleNextStep();
     }
+  }
+
+  function handleDiscardClick() {
+    resetFormStage();
+    closeModal();
   }
 
   return (
@@ -79,11 +86,7 @@ function CustomizeLayer(props: CustomizeLayerProps) {
         <label className={styles.label} htmlFor="pointColor">
           Point Color:
         </label>
-        <ColorSelect
-          options={colorOptions}
-          value={pointColor}
-          onChange={handleColorChange}
-        />
+        <ColorSelect />
       </div>
       <div className={styles.formGroup}>
         <label className={styles.label} htmlFor="legend">
@@ -113,7 +116,7 @@ function CustomizeLayer(props: CustomizeLayerProps) {
       </div>
       {error && <p className={styles.error}>{error}</p>}
       <div className={styles.buttonContainer}>
-        <button className={styles.button} onClick={closeModal as any}>
+        <button className={styles.button} onClick={handleDiscardClick}>
           Discard
         </button>
         <button className={styles.button} onClick={handleButtonClick}>

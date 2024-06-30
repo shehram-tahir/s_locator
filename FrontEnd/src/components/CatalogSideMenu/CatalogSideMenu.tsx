@@ -1,64 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, MouseEvent } from "react";
 import styles from "./CatalogSideMenu.module.css";
 import { MdLayers, MdArrowBackIos } from "react-icons/md";
-import Modal from "../Modal/Modal";
-import { CatalogSideMenuProps } from "../../types/allTypesAndInterfaces";
-import { useCatalogContext } from "../../context/CatalogContext";
-import Loader from "../Loader/Loader";
+import { useUIContext } from "../../context/UIContext";
 import DataContainer from "../DataContainer/DataContainer";
+import { useCatalogContext } from "../../context/CatalogContext";
 
-function CatalogSideMenu(props: CatalogSideMenuProps) {
-  const { goBack, setSidebarMode } = props;
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<"catalog" | "layer">(
-    "layer"
-  );
+function CatalogSideMenu() {
+  const { openModal, setSidebarMode } = useUIContext();
+  const { setSelectedContainerType, selectedContainerType } =
+    useCatalogContext();
 
-
-  const { resetFormStage, isLoading } = useCatalogContext();
-
-  function openModal(contentType: "catalog" | "layer") {
-    setModalContent(contentType);
-    setIsModalOpen(true);
+  function openCatalogModal(contentType: "Catalogue" | "Layer") {
+    setSelectedContainerType(contentType);
+    openModal(<DataContainer />);
   }
 
-  function closeModal() {
-    resetFormStage('catalogue');
-    setIsModalOpen(false);
+  function handleBackClick(event: MouseEvent) {
+    setSidebarMode("default");
   }
 
-  // Modal content based on the state
-  const modalContentElement = isLoading ? (
-    <div className={styles.loaderContainer}>
-      <Loader />
-    </div>
-  ) : modalContent === "catalog" ? (
-    <DataContainer
-      closeModal={closeModal}
-      setSidebarMode={setSidebarMode}
-      containerType="Catalogue"
-    />
-  ) : (
-    <DataContainer
-      closeModal={closeModal}
-      setSidebarMode={setSidebarMode}
-      containerType="Layer"
-    />
-  );
+  function handleAddCatalogClick(event: MouseEvent) {
+    openCatalogModal("Catalogue");
+  }
+
+  function handleAddLayerClick(event: MouseEvent) {
+    openCatalogModal("Layer");
+  }
 
   return (
     <>
       <nav className={styles.nav}>
-        <MdArrowBackIos className={styles.backIcon} onClick={goBack} />
+        <MdArrowBackIos className={styles.backIcon} onClick={handleBackClick} />
         <MdLayers className={styles.icon} />
       </nav>
       <div className={styles.section}>
         <p className={styles.sectionTitle}>Datasets</p>
         <button
           className={`${styles.addButton} ${styles.addDataButton}`}
-          onClick={function () {
-            openModal("catalog");
-          }}
+          onClick={handleAddCatalogClick}
         >
           + Add Catalog
         </button>
@@ -67,9 +46,7 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
         <p className={styles.sectionTitle}>Layers</p>
         <button
           className={`${styles.addButton} ${styles.addLayerButton}`}
-          onClick={function () {
-            openModal("layer");
-          }}
+          onClick={handleAddLayerClick}
         >
           + Add Layer
         </button>
@@ -84,11 +61,6 @@ function CatalogSideMenu(props: CatalogSideMenuProps) {
           <option value="normal">Normal</option>
         </select>
       </div>
-      {isModalOpen && (
-        <Modal show={isModalOpen} onClose={closeModal} >
-          {modalContentElement}
-        </Modal>
-      )}
     </>
   );
 }

@@ -1,25 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, MouseEvent } from "react";
 import styles from "./ColorSelect.module.css";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { ColorSelectProps } from "../../types/allTypesAndInterfaces";
+import { useLayerContext } from "../../context/LayerContext";
 
-function ColorSelect(props: ColorSelectProps) {
-  const { options, value, onChange } = props;
+const ColorSelect: React.FC = function ColorSelect() {
+  const { colorOptions, selectedColor, setSelectedColor } = useLayerContext();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Handle option click and pass the selected value to the parent component
   function handleOptionClick(option: string) {
-    onChange(option);
+    setSelectedColor(option);
     setIsOpen(false);
   }
 
-  function toggleDropdown() {
+  function toggleDropdown(event: MouseEvent) {
     setIsOpen(!isOpen);
   }
 
-  // Render the select options
   function renderOptions() {
-    return options.map(function (option) {
+    return colorOptions.map(function (option) {
       return (
         <div
           key={option}
@@ -41,12 +39,14 @@ function ColorSelect(props: ColorSelectProps) {
   return (
     <div className={styles.customSelectContainer}>
       <div className={styles.customSelectValue} onClick={toggleDropdown}>
-        <span className={value ? styles.selectedText : styles.placeholder}>
-          {value || "Select a color"}
+        <span
+          className={selectedColor ? styles.selectedText : styles.placeholder}
+        >
+          {selectedColor || "Select a color"}
         </span>
         <span
           className={styles.colorCircle}
-          style={{ backgroundColor: value.toLowerCase() }}
+          style={{ backgroundColor: selectedColor.toLowerCase() }}
         />
         <MdKeyboardArrowDown
           className={`${styles.arrowIcon} ${isOpen ? styles.open : ""}`}
@@ -57,6 +57,6 @@ function ColorSelect(props: ColorSelectProps) {
       )}
     </div>
   );
-}
+};
 
 export default ColorSelect;

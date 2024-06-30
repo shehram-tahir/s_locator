@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./CatalogueCard.module.css";
 import { CatalogueCardProps } from "../../types/allTypesAndInterfaces";
+import { useCatalogContext } from "../../context/CatalogContext";
 
 function CatalogueCard(props: CatalogueCardProps) {
   const {
@@ -11,14 +12,14 @@ function CatalogueCard(props: CatalogueCardProps) {
     records_number,
     can_access,
     onMoreInfo,
-    containerType ,
   } = props;
 
   // Handle add button click
-  
+
+  const { selectedContainerType: containerType } = useCatalogContext();
 
   function renderActionItems() {
-    if (containerType) {
+    if (containerType !== "Home") {
       return (
         <li className={styles.actionItem}>
           <div

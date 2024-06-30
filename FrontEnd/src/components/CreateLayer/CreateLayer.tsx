@@ -8,21 +8,8 @@ import Loader from "../Loader/Loader";
 import ErrorIconFeedback from "../ErrorIconFeedback/ErrorIconFeedback";
 import SavedIconFeedback from "../SavedIconFeedback/SavedIconFeedback";
 
-interface CreateLayerProps {
-  closeModal: Function;
-}
-
-function CreateLayer(props: CreateLayerProps) {
-  const { closeModal } = props;
-
-  const {
-    formStage,
-    handleSaveMethodChange,
-    handleSave,
-    loading,
-    isSaved,
-    isError,
-  } = useLayerContext();
+function CreateLayer() {
+  const { formStage, loading, isSaved, isError } = useLayerContext();
 
   function renderContent() {
     if (loading) {
@@ -43,24 +30,17 @@ function CreateLayer(props: CreateLayerProps) {
   function renderFormContent() {
     if (formStage === "initial" || formStage === "secondStep") {
       return (
-        <>
+        <React.Fragment>
           <h2 className={styles.title}>Create Layer</h2>
           <p>Provide some details to create a new layer.</p>
           {formStage === "initial" && <LayerDetailsForm />}
-          {formStage === "secondStep" && (
-            <CustomizeLayer closeModal={closeModal} />
-          )}
-        </>
+          {formStage === "secondStep" && <CustomizeLayer />}
+        </React.Fragment>
       );
     }
 
     if (formStage === "thirdStep") {
-      return (
-        <SaveOptions
-          handleSave={handleSave}
-          handleSaveMethodChange={handleSaveMethodChange}
-        />
-      );
+      return <SaveOptions />;
     }
 
     return null;

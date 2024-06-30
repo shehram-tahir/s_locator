@@ -1,18 +1,34 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { MdInfo, MdMap, MdTableChart, MdFactory } from "react-icons/md";
 import { FaLayerGroup, FaBoxOpen } from "react-icons/fa";
 import styles from "./DefaultMenu.module.css";
-import { DefaultMenuProps } from "../../types/allTypesAndInterfaces";
+import CreateLayer from "../CreateLayer/CreateLayer";
+import { useUIContext } from "../../context/UIContext";
 
-function DefaultMenu(props: DefaultMenuProps) {
+function DefaultMenu() {
   const {
     isMenuExpanded,
     isViewClicked,
     handleViewClick,
-    openLayerModal,
     setSidebarMode,
-  } = props;
+    openModal,
+  } = useUIContext();
+
+  function openLayerModal() {
+    openModal(<CreateLayer />, { isSmaller: true });
+  }
+
+  function handleViewClickContainer() {
+    handleViewClick();
+  }
+
+  function handleOpenLayerModal() {
+    openLayerModal();
+  }
+
+  function handleSetSidebarMode() {
+    setSidebarMode("catalog");
+  }
 
   return (
     <ul className={styles.menuList}>
@@ -35,7 +51,10 @@ function DefaultMenu(props: DefaultMenuProps) {
         </Link>
       </li>
       <li>
-        <div onClick={handleViewClick} className={styles.iconContainer}>
+        <div
+          onClick={handleViewClickContainer}
+          className={styles.iconContainer}
+        >
           <MdFactory className={styles.icon} />
           {isMenuExpanded && <span> View</span>}
         </div>
@@ -43,16 +62,17 @@ function DefaultMenu(props: DefaultMenuProps) {
       {isViewClicked && (
         <>
           <li>
-            <div onClick={openLayerModal} className={styles.iconContainer}>
+            <div
+              onClick={handleOpenLayerModal}
+              className={styles.iconContainer}
+            >
               <FaLayerGroup className={styles.icon} />
               {isMenuExpanded && <span> Create Layer</span>}
             </div>
           </li>
           <li>
             <div
-              onClick={function () {
-                setSidebarMode("catalog");
-              }}
+              onClick={handleSetSidebarMode}
               className={styles.iconContainer}
             >
               <FaBoxOpen className={styles.icon} />

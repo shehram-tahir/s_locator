@@ -1,4 +1,3 @@
-// src/context/CatalogContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { CatalogContextType } from "../types/allTypesAndInterfaces";
 
@@ -18,18 +17,22 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const [subscriptionPrice, setSubscriptionPrice] = useState("");
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
+  const [selectedContainerType, setSelectedContainerType] = useState<
+    "Catalogue" | "Layer" | "Home"
+  >("Home");
 
+  // Function to handle adding a catalog, simulating an API call and setting state
   function handleAddClick(id: string, name: string) {
-    // Fetch the chosen catalog or layer to pre-populate the description and price
-
     console.log(`Adding catalogue with ID: ${id} and Name: ${name}`);
     setIsLoading(true);
 
+    // Simulated data fetching
     const data = {
       legendList: `Legend List for ${name}`,
       subscriptionPrice: "99.99",
     };
 
+    // Set selected catalog and related details
     setSelectedCatalog({ id, name });
     setLegendList(data.legendList);
     setSubscriptionPrice(data.subscriptionPrice);
@@ -41,10 +44,12 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     setFormStage("catalogue details");
   }
 
+  // Function to handle save button click, transitioning to save options
   function handleSaveClick() {
     setFormStage("save options");
   }
 
+  // Function to handle actual save operation, simulating an API call
   function handleSave() {
     const saveData = {
       catalogId: selectedCatalog?.id,
@@ -56,24 +61,27 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     console.log("Saving data:", saveData);
 
     setIsLoading(true);
+
+    // Simulated API call with a timeout
     setTimeout(function () {
       console.log("API call to save the data:", saveData);
       setIsLoading(false);
       if (true) {
         setIsSaved(true);
+        setLegendList("");
+        setSubscriptionPrice("");
+        setDescription("");
+        setName("");
       } else {
         setIsError(true);
       }
     }, 2000);
   }
 
-  function handleSaveMethodChange(method: string) {
-    setSaveMethod(method);
-  }
-
+  // Function to reset the form stage and related state
   function resetFormStage(resetTo: string) {
-    setDescription("")
-    setName("")
+    setDescription("");
+    setName("");
     setIsSaved(false);
     setIsError(false);
     setFormStage(resetTo);
@@ -105,9 +113,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         handleAddClick,
         handleSaveClick,
         handleSave,
-
-        handleSaveMethodChange,
         resetFormStage,
+        selectedContainerType,
+        setSelectedContainerType,
+        setSaveOption: setSaveMethod, // Added to handle save option setting
       }}
     >
       {children}
@@ -115,6 +124,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Hook to use the CatalogContext
 export function useCatalogContext() {
   const context = useContext(CatalogContext);
   if (!context) {

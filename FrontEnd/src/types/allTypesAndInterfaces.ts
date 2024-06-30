@@ -1,25 +1,12 @@
-import React, { ChangeEvent } from "react";
+import React, { ReactNode } from "react";
 
 // General Interfaces
 export interface ModalProps {
-  show: boolean;
-  onClose(): void;
   children: React.ReactNode;
   darkBackground?: boolean;
-  isSmaller?:boolean;
+  isSmaller?: boolean;
 }
 
-export interface ExpandableMenuProps {
-  isExpanded: boolean;
-  toggleMenu(): void;
-  children?: React.ReactNode;
-}
-
-export interface ColorSelectProps {
-  options: string[];
-  value: string;
-  onChange(value: string): void;
-}
 
 export interface FormData {
   selectedCountry: string;
@@ -28,20 +15,9 @@ export interface FormData {
 }
 
 // Catalogue Interfaces
-export interface DataContainerProps {
-  closeModal(): void;
-  isFromAddCatalogue?: boolean;
-  isFromAddLayer?: boolean;
-  containerType?: string | undefined;
-  setSidebarMode?: React.Dispatch<React.SetStateAction<string>>;
-}
 
-export interface DefaultMenuProps {
-  isMenuExpanded: boolean;
-  isViewClicked: boolean;
-  handleViewClick(): void;
-  openLayerModal():  void;
-  setSidebarMode(mode: string): void;
+export interface ExpandableMenuProps {
+  children: ReactNode;
 }
 
 export interface Catalog {
@@ -62,25 +38,9 @@ export interface CatalogueCardProps {
   records_number: number;
   can_access: boolean;
   onMoreInfo(): void;
-  containerType: string;
-}
-
-export interface CatalogSideMenuProps {
-  goBack(): void;
-  setSidebarMode:React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Create Catalog Interfaces
-export interface CreateCatalogProps {
-  closeModal(): void;
-  isFromAddCatalogue: boolean;
-  isFromAddLayer: boolean;
-  setModalClass(className: string): void;
-}
-
-export interface CatalogDetailsProps {
-  goBackToDefaultMenu(): void;
-}
 
 // Catalog Context Type
 export interface CatalogContextType {
@@ -94,6 +54,7 @@ export interface CatalogContextType {
   subscriptionPrice: string;
   description: string;
   name: string;
+  selectedContainerType: "Catalogue" | "Layer" | "Home";
   setFormStage: React.Dispatch<React.SetStateAction<string>>;
   setSaveMethod: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -106,11 +67,14 @@ export interface CatalogContextType {
   setSubscriptionPrice: React.Dispatch<React.SetStateAction<string>>;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   setName: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedContainerType: React.Dispatch<
+    React.SetStateAction<"Catalogue" | "Layer" | "Home">
+  >;
   handleAddClick(id: string, name: string): void;
   handleSaveClick(): void;
   handleSave(): void;
-  handleSaveMethodChange(method: string): void;
-  resetFormStage(resetTo: string): void; 
+  resetFormStage(resetTo: string): void;
+  setSaveOption: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Layer Context Types
@@ -164,10 +128,33 @@ export interface LayerContextType {
   setSaveMethod: React.Dispatch<React.SetStateAction<string>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handleNextStep(): void;
-  handleSaveMethodChange(method: string): void;
   handleSave(): void;
   resetFormStage(): void;
+  colorOptions: string[];
+  selectedColor: string;
+  setSelectedColor: React.Dispatch<React.SetStateAction<string>>;
+  setSaveOption: React.Dispatch<React.SetStateAction<string>>; 
 }
+
+export interface ModalOptions {
+  darkBackground?: boolean;
+  isSmaller?: boolean;
+}
+
+export interface UIContextProps {
+  isModalOpen: boolean;
+  modalContent: ReactNode;
+  modalOptions: ModalOptions;
+  sidebarMode: string;
+  isMenuExpanded: boolean;
+  isViewClicked: boolean;
+  openModal(content: ReactNode, options?: ModalOptions): void;
+  closeModal(): void;
+  toggleMenu(): void;
+  handleViewClick(): void;
+  setSidebarMode(mode: string): void;
+}
+
 
 // Map and GeoPoint Interfaces
 export interface GeoPoint {
@@ -198,12 +185,6 @@ export interface Feature {
 export interface FeatureCollection {
   type: "FeatureCollection";
   features: Feature[];
-}
-
-// Save Options Interface
-export interface SaveOptionsProps {
-  handleSave(): void;
-  handleSaveMethodChange(method: string): void;
 }
 
 // Commented out to avoid duplication

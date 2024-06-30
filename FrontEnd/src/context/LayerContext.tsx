@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import {
   FirstFormResponse,
   LayerContextType,
@@ -27,13 +20,16 @@ export function LayerProvider(props: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isError, setIsError] = useState(false);
-
   const [firstFormResponse, setFirstFormResponse] = useState<
     string | FirstFormResponse
   >("");
-
   const [saveMethod, setSaveMethod] = useState("");
 
+  // Define color options and selected color state
+  const colorOptions = ["Red", "Green", "Blue", "Yellow", "Black"];
+  const [selectedColor, setSelectedColor] = useState<string>("");
+
+  // Function to handle progressing to the next step in the form
   function handleNextStep() {
     if (formStage === "initial") {
       setFormStage("secondStep");
@@ -42,10 +38,7 @@ export function LayerProvider(props: { children: ReactNode }) {
     }
   }
 
-  function handleSaveMethodChange(method: string) {
-    setSaveMethod(method);
-  }
-
+  // Function to handle the save operation, simulating an API call
   function handleSave() {
     const saveData = {
       firstFormResponse,
@@ -56,9 +49,8 @@ export function LayerProvider(props: { children: ReactNode }) {
     console.log("Starting save process with the following data:", saveData);
 
     setLoading(true);
-    resetFormStage();
 
-    // Simulate an API call
+    // Simulate an API call with a timeout
     setTimeout(function () {
       setLoading(false);
       const isSuccess = true;
@@ -72,10 +64,10 @@ export function LayerProvider(props: { children: ReactNode }) {
     }, 1000);
   }
 
+  // Function to reset the form stage and related state
   function resetFormStage() {
     setIsSaved(false);
     setIsError(false);
-    
     setFormStage("initial");
   }
 
@@ -97,9 +89,12 @@ export function LayerProvider(props: { children: ReactNode }) {
         setSaveMethod,
         setLoading,
         handleNextStep,
-        handleSaveMethodChange,
         handleSave,
         resetFormStage,
+        colorOptions,
+        selectedColor,
+        setSelectedColor,
+        setSaveOption: setSaveMethod, // Ensure setSaveOption is available
       }}
     >
       {children}
@@ -107,6 +102,7 @@ export function LayerProvider(props: { children: ReactNode }) {
   );
 }
 
+// Hook to use the LayerContext
 export function useLayerContext() {
   const context = useContext(LayerContext);
   if (!context) {

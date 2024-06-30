@@ -1,61 +1,49 @@
 import React, { useState, useEffect } from "react";
 import CatalogueCard from "../CatalogueCard/CatalogueCard";
 import styles from "./DataContainer.module.css";
-import { DataContainerProps } from "../../types/allTypesAndInterfaces";
 import { HttpReq } from "../../services/apiService";
 import urls from "../../urls.json";
 import { Catalog } from "../../types/allTypesAndInterfaces";
 import { useNavigate } from "react-router-dom";
 import { useCatalogContext } from "../../context/CatalogContext";
+import { useUIContext } from "../../context/UIContext";
 
-function DataContainer(props: DataContainerProps) {
-  const { closeModal, containerType = undefined, setSidebarMode } = props;
+function DataContainer() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(
-    containerType === "Catalogue" || containerType === undefined
-      ? "Data Catalogue"
-      : "Data Layer"
-  );
-
+  const { selectedContainerType, handleAddClick } = useCatalogContext();
+  const { closeModal, setSidebarMode } = useUIContext();
+  const [activeTab, setActiveTab] = useState("Data Catalogue");
   const [resData, setResData] = useState<Catalog[] | string>("");
   const [resMessage, setResMessage] = useState<string>("");
   const [resId, setResId] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const { handleAddClick } = useCatalogContext();
 
-  function fetchData() {
-    const endpoint =
-      containerType === "Catalogue" || containerType === undefined
-        ? urls.catlog_collection
-        : urls.layer_collection;
+  useEffect(
+    function () {
+      const endpoint =
+        selectedContainerType === "Catalogue" || "Home"
+          ? urls.catlog_collection
+          : urls.layer_collection;
 
-    HttpReq<Catalog[]>(
-      endpoint,
-      setResData,
-      setResMessage,
-      setResId,
-      setLoading,
-      setError
-    );
-  }
-
-  useEffect(fetchData, [containerType]);
+      HttpReq<Catalog[]>(
+        endpoint,
+        setResData,
+        setResMessage,
+        setResId,
+        setLoading,
+        setError
+      );
+    },
+    [selectedContainerType]
+  );
 
   function handleCatalogCardClick(selectedCatalog: Catalog) {
     const queryParams = `?catalogue_dataset_id=${selectedCatalog.id}`;
-
     navigate(`${queryParams}`, { replace: true });
 
-
-    //Only Calling handleAddClick if the parent container is passing ContainerType form the CatalogSideMenu component
-    if (containerType) {
-      handleAddClick(selectedCatalog.id, selectedCatalog.name);
-    }
-
-    if (setSidebarMode) {
-      setSidebarMode!("catalogDetails");
-    }
+    handleAddClick(selectedCatalog.id, selectedCatalog.name);
+    setSidebarMode("catalogDetails");
     closeModal();
   }
 
@@ -68,9 +56,10 @@ function DataContainer(props: DataContainerProps) {
         name={item.name}
         records_number={item.records_number}
         description={item.description}
-        onMoreInfo={() => handleCatalogCardClick(item)}
+        onMoreInfo={function () {
+          handleCatalogCardClick(item);
+        }}
         can_access={item.can_access}
-        containerType={containerType as string}
       />
     );
   }
@@ -90,7 +79,7 @@ function DataContainer(props: DataContainerProps) {
   return (
     <div className={styles.dataContainer}>
       <h2 className={styles.dataHeading}>
-        {containerType === "Catalogue"
+        {selectedContainerType === "Catalogue" || "Home"
           ? "Add Data to Map"
           : "Add Layers to Map"}
       </h2>
@@ -101,19 +90,25 @@ function DataContainer(props: DataContainerProps) {
               ? styles.activeTab
               : styles.tabButton
           }
-          onClick={() =>
+          onClick={function () {
             setActiveTab(
-              containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"
-            )
-          }
+              selectedContainerType === "Catalogue"
+                ? "Data Catalogue"
+                : "Data Layer"
+            );
+          }}
         >
-          {containerType === "Catalogue" ? "Data Catalogue" : "Data Layer"}
+          {selectedContainerType === "Catalogue" || "Home"
+            ? "Data Catalogue"
+            : "Data Layer"}
         </button>
         <button
           className={
             activeTab === "Load Files" ? styles.activeTab : styles.tabButton
           }
-          onClick={() => setActiveTab("Load Files")}
+          onClick={function () {
+            setActiveTab("Load Files");
+          }}
         >
           Load Files
         </button>
@@ -123,14 +118,19 @@ function DataContainer(props: DataContainerProps) {
               ? styles.activeTab
               : styles.tabButton
           }
-          onClick={() => setActiveTab("Connect Your Data")}
+          onClick={function () {
+            setActiveTab("Connect Your Data");
+          }}
         >
           Connect Your Data
         </button>
       </div>
       {activeTab === "Data Catalogue" || activeTab === "Data Layer" ? (
         <div className={styles.dataGrid}>
-          {Array.isArray(resData) && resData.map(makeCard)}
+          {Array.isArray(resData) &&
+            resData.map(function (item: Catalog) {
+              return makeCard(item);
+            })}
         </div>
       ) : activeTab === "Load Files" ? (
         <div className={styles.placeholderContent}>Load Files Content</div>

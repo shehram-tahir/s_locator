@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 import styles from "./SaveOptions.module.css";
-import { SaveOptionsProps } from "../../types/allTypesAndInterfaces";
+import { useLayerContext } from "../../context/LayerContext";
+import { useCatalogContext } from "../../context/CatalogContext";
 
-function SaveOptions(props: SaveOptionsProps) {
-  const { handleSave, handleSaveMethodChange } = props;
+function SaveOptions() {
   const [selectedOption, setSelectedOption] = useState("");
+  const layerContext = useLayerContext();
+  const catalogContext = useCatalogContext();
+
+  const isLayerContextActive = layerContext.formStage === "thirdStep";
+  const setSaveOption = isLayerContextActive
+    ? layerContext.setSaveOption
+    : catalogContext.setSaveOption;
+  const handleSave = isLayerContextActive
+    ? layerContext.handleSave
+    : catalogContext.handleSave;
 
   function handleOptionChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value } = event.target;
     setSelectedOption(value);
-    handleSaveMethodChange(value);
+    setSaveOption(value);
+  }
+
+  function handleSaveClick() {
+    handleSave();
   }
 
   return (
@@ -72,7 +86,7 @@ function SaveOptions(props: SaveOptionsProps) {
       <div className={styles.buttonContainer}>
         <button
           className={styles.button}
-          onClick={handleSave}
+          onClick={handleSaveClick}
           disabled={!selectedOption}
         >
           Save

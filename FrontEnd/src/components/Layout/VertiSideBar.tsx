@@ -1,73 +1,32 @@
-import React, { useState, ReactNode } from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 import styles from "./VertiSideBar.module.css";
 import ExpandableMenu from "../ExpandableMenu/ExpandableMenu";
 import Home from "../../pages/Home/Home";
 import About from "../../pages/About/About";
-import CreateLayer from "../CreateLayer/CreateLayer";
 import Dataview from "../../pages/Dataview/Dataview";
-import Modal from "../Modal/Modal";
-import { useLayerContext } from "../../context/LayerContext";
 import { useCatalogContext } from "../../context/CatalogContext";
+import { useUIContext} from "../../context/UIContext";
 import CatalogSideMenu from "../CatalogSideMenu/CatalogSideMenu";
 import CatalogDetailsForm from "../CatalogDetailsForm/CatalogDetailsForm";
 import DefaultMenu from "../DefaultMenu/DefaultMenu";
 
 function Layout() {
-  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
-  const [isViewClicked, setIsViewClicked] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<ReactNode | null>(null);
-  const [sidebarMode, setSidebarMode] = useState("default");
-  const { resetFormStage } = useLayerContext();
-  const { handleAddClick, setFormStage, selectedCatalog } = useCatalogContext();
-
-  function toggleMenu() {
-    setIsMenuExpanded(!isMenuExpanded);
-  }
-
-  function handleViewClick() {
-    setIsViewClicked(!isViewClicked);
-  }
-
-  function openLayerModal() {
-    setModalContent(<CreateLayer closeModal={closeModal} />);
-    setIsModalOpen(true);
-  }
-
-  function closeModal() {
-    setIsModalOpen(false);
-    resetFormStage();
-    setModalContent(null);
-  }
-
-  function goBackToDefaultMenu() {
-    setSidebarMode("default");
-  }
-
-
+  const { selectedCatalog } = useCatalogContext();
+  const { sidebarMode } = useUIContext();
 
   const sidebarContent =
     sidebarMode === "default" ? (
-      <ExpandableMenu isExpanded={isMenuExpanded} toggleMenu={toggleMenu}>
-        <DefaultMenu
-          isMenuExpanded={isMenuExpanded}
-          isViewClicked={isViewClicked}
-          handleViewClick={handleViewClick}
-          openLayerModal={openLayerModal}
-          setSidebarMode={setSidebarMode}
-        />
+      <ExpandableMenu >
+        <DefaultMenu />
       </ExpandableMenu>
     ) : sidebarMode === "catalog" ? (
       <div className={styles.CreateCatalogMenu}>
-        <CatalogSideMenu
-          goBack={goBackToDefaultMenu}
-          setSidebarMode={setSidebarMode}
-        />
+        <CatalogSideMenu />
       </div>
     ) : sidebarMode === "catalogDetails" && selectedCatalog ? (
       <div className={styles.CreateCatalogMenu}>
-        <CatalogDetailsForm goBackToDefaultMenu={goBackToDefaultMenu} />
+        <CatalogDetailsForm />
       </div>
     ) : null;
 
@@ -81,13 +40,6 @@ function Layout() {
           <Route path="/about" element={<About />} />
         </Routes>
       </div>
-      <Modal
-        show={isModalOpen}
-        onClose={closeModal}
-        isSmaller={true}
-      >
-        {modalContent}
-      </Modal>
     </div>
   );
 }
