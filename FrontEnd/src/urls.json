@@ -7,5 +7,6 @@
   "http_catlog_data": "http_catlog_data",
   "http_single_nearby":"http_single_nearby",
   "country_city":"country_city",
-  "nearby_categories":"nearby_categories"
+  "nearby_categories":"nearby_categories",
+  "old_nearby_categories":"old_nearby_categories"
 }

@@ -62,7 +62,7 @@ function LayerDetailsForm() {
     );
 
     HttpReq<string[]>(
-      urls.nearby_categories,
+      urls.old_nearby_categories,
       function (data) {
         setCategories(data as string[]);
       },
