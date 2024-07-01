@@ -9,7 +9,8 @@ from data_fetcher import (
     nearby_boxmap, 
     fetch_country_city_data,
     fetch_nearby_categories,
-    fetch_layer_collection
+    fetch_layer_collection,
+    old_fetch_nearby_categories
       )
 from all_types.myapi_dtypes import (
     LocationReq,
@@ -18,7 +19,8 @@ from all_types.myapi_dtypes import (
     restype_fetch_acknowlg_id,
     ResTypeMapData,
     CountryCityData,
-    NearbyCategories
+    NearbyCategories,
+    OldNearbyCategories
 )
 from all_types.myapi_dtypes import MapData
 from typing import Type, Callable, Awaitable, Any, Optional
@@ -209,5 +211,15 @@ async def nearby_categories():
         None,
         NearbyCategories,
         fetch_nearby_categories,
+    )
+    return response
+
+@app.get(CONF.old_nearby_categories, response_model=OldNearbyCategories)
+async def old_nearby_categories():
+    response = await http_handling(
+        None,
+        None,
+        OldNearbyCategories,
+        old_fetch_nearby_categories,
     )
     return response

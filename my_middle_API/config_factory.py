@@ -18,6 +18,7 @@ class static_ApiConfig:
     http_single_nearby: str = "/fastapi/http_single_nearby"
     country_city: str = "/fastapi/country_city"
     nearby_categories: str = "/fastapi/nearby_categories"
+    old_nearby_categories: str = "/fastapi/old_nearby_categories"
     google_fields: str = "name,formatted_address,user_ratings_total,rating,geometry"
 
 
