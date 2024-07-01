@@ -4,5 +4,8 @@
   "layer_collection": "/layer_collection",
   "fetch_acknowlg_id": "/fetch_acknowlg_id",
   "ws_dataset_load": "/ws_dataset_load/",
-  "http_catlog_data": "http_catlog_data"
+  "http_catlog_data": "http_catlog_data",
+  "http_single_nearby":"http_single_nearby",
+  "country_city":"country_city",
+  "nearby_categories":"nearby_categories"
 }

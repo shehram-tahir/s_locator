@@ -8,6 +8,7 @@ import {
 import styles from "./LayerDetailsForm.module.css";
 import Loader from "../Loader/Loader";
 import { useLayerContext } from "../../context/LayerContext";
+import urls from "../../urls.json";
 
 function LayerDetailsForm() {
   const { handleNextStep, setFirstFormResponse, loading } = useLayerContext();
@@ -50,7 +51,7 @@ function LayerDetailsForm() {
 
   function fetchData() {
     HttpReq<string[]>(
-      "country_city",
+      urls.country_city,
       function (data) {
         setCountries(processCountries(data));
       },
@@ -61,7 +62,7 @@ function LayerDetailsForm() {
     );
 
     HttpReq<string[]>(
-      "nearby_categories",
+      urls.nearby_categories,
       function (data) {
         setCategories(data as string[]);
       },
@@ -125,7 +126,7 @@ function LayerDetailsForm() {
     };
 
     HttpReq<FirstFormResponse>(
-      "http_single_nearby",
+      urls.http_single_nearby,
       setFirstFormResponse,
       setPostResMessage,
       setPostResId,
