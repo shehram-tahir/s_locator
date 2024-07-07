@@ -1,6 +1,6 @@
 import requests
 
-from all_types.myapi_dtypes import LocationReq
+from all_types.myapi_dtypes import ReqLocation
 from config_factory import get_conf
 
 CONF = get_conf()
@@ -33,7 +33,7 @@ CONF = get_conf()
 
 
 
-async def fetch_from_google_maps_api(req: LocationReq):
+async def fetch_from_google_maps_api(req: ReqLocation):
     lat, lng, radius, place_type = req.lat, req.lng, req.radius, req.type
 
     
@@ -60,6 +60,9 @@ async def fetch_from_google_maps_api(req: LocationReq):
 
     if response.status_code == 200:
         results = response.json().get("places","")
+# import json
+# with open("Backend/datasets/111.json", "w") as file:
+#     json.dump(results, file, indent=4)
         return results
     else:
         print("Error:", response.status_code)
