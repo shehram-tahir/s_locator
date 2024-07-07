@@ -48,11 +48,18 @@ export async function HttpReq<T>(
   method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'get',
   body?: any
 ) {
-  setLoading(true); 
+  setLoading(true);
   try {
+    // Wrap the body in the new structure
+    const wrappedBody = method !== 'get' ? {
+      message: "Request from frontend",
+      request_info: {},
+      request_body: body
+    } : undefined;
+
     const response = await apiClient[method](
       end_point,
-      method !== "get" ? body : undefined
+      wrappedBody
     );
 
     const message: string = response.data.message;
