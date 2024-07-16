@@ -12,6 +12,7 @@ function CatalogueCard(props: CatalogueCardProps) {
     records_number,
     can_access,
     onMoreInfo,
+    typeOfCard,
   } = props;
 
   // Handle add button click

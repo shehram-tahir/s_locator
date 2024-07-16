@@ -4,11 +4,11 @@ import { MdLayers, MdArrowBackIos } from "react-icons/md";
 import { useUIContext } from "../../context/UIContext";
 import DataContainer from "../DataContainer/DataContainer";
 import { useCatalogContext } from "../../context/CatalogContext";
+import MultipleLayersSetting from "../MultipleLayersSetting/MultipleLayersSetting";
 
 function CatalogSideMenu() {
   const { openModal, setSidebarMode } = useUIContext();
-  const { setSelectedContainerType, selectedContainerType } =
-    useCatalogContext();
+  const { setSelectedContainerType, selectedLayers } = useCatalogContext();
 
   function openCatalogModal(contentType: "Catalogue" | "Layer") {
     setSelectedContainerType(contentType);
@@ -28,7 +28,7 @@ function CatalogSideMenu() {
   }
 
   return (
-    <>
+    <div className={styles.container}>
       <nav className={styles.nav}>
         <MdArrowBackIos className={styles.backIcon} onClick={handleBackClick} />
         <MdLayers className={styles.icon} />
@@ -51,17 +51,10 @@ function CatalogSideMenu() {
           + Add Layer
         </button>
       </div>
-      <div className={styles.controls}>
-        <label className={styles.label}>Layer Blending</label>
-        <select className={styles.select}>
-          <option value="normal">Normal</option>
-        </select>
-        <label className={styles.label}>Map Overlay Blending</label>
-        <select className={styles.select}>
-          <option value="normal">Normal</option>
-        </select>
-      </div>
-    </>
+      {selectedLayers.map(function (layer, index) {
+        return <MultipleLayersSetting key={index} layerIndex={index} />;
+      })}
+    </div>
   );
 }
 

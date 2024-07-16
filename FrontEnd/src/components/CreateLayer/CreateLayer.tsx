@@ -9,14 +9,15 @@ import ErrorIconFeedback from "../ErrorIconFeedback/ErrorIconFeedback";
 import SavedIconFeedback from "../SavedIconFeedback/SavedIconFeedback";
 
 function CreateLayer() {
-  const { formStage, loading, isSaved, isError } = useLayerContext();
+  const { formStage, loading, isError, saveResponse } =
+    useLayerContext();
 
   function renderContent() {
     if (loading) {
       return <Loader />;
     }
 
-    if (isSaved) {
+    if (saveResponse) {
       return <SavedIconFeedback />;
     }
 

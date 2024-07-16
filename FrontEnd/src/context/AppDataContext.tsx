@@ -17,7 +17,7 @@ const defaultAppDataContextValue: AppDataContextType = {
 const AppDataContext = createContext<AppDataContextType>(defaultAppDataContextValue);
 
 interface AppDataProviderProps {
-  children: ReactNode;
+  children: ReactNode;  
 }
 
 

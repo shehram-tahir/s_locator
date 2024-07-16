@@ -11,7 +11,7 @@ function SaveOptions() {
   const isLayerContextActive = layerContext.formStage === "thirdStep";
   const setSaveOption = isLayerContextActive
     ? layerContext.setSaveOption
-    : catalogContext.setSaveOption;
+    : catalogContext.setSaveMethod;
   const handleSave = isLayerContextActive
     ? layerContext.handleSave
     : catalogContext.handleSave;

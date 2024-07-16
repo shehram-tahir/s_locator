@@ -1,12 +1,12 @@
-import axios, { AxiosInstance } from 'axios';
-import urls from '../urls.json';
+import axios, { AxiosInstance } from "axios";
+import urls from "../urls.json";
 
 const baseUrl = urls.REACT_APP_API_URL;
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: baseUrl,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -40,31 +40,30 @@ export const apiClient: AxiosInstance = axios.create({
 
 export async function HttpReq<T>(
   end_point: string,
-  setResData: React.Dispatch<React.SetStateAction<T | string>>,
+  setResData: (data: T) => void,
   setResMessage: (message: string) => void,
   setResId: (id: string) => void,
   setLoading: (loading: boolean) => void,
   setError: (error: Error | null) => void,
-  method: 'get' | 'post' | 'put' | 'delete' | 'patch' = 'get',
+  method: "get" | "post" | "put" | "delete" | "patch" = "get",
   body?: any
 ) {
   setLoading(true);
   try {
-    // Wrap the body in the new structure
-    const wrappedBody = method !== 'get' ? {
-      message: "Request from frontend",
-      request_info: {},
-      request_body: body
-    } : undefined;
+    const wrappedBody =
+      method !== "get"
+        ? {
+            message: "Request from frontend",
+            request_info: {},
+            request_body: body,
+          }
+        : undefined;
 
-    const response = await apiClient[method](
-      end_point,
-      wrappedBody
-    );
+    const response = await apiClient[method](end_point, wrappedBody);
 
     const message: string = response.data.message;
     const request_id: string = response.data.request_id;
-    const data: T | string = response.data.data;
+    const data: T = response.data.data;
 
     setResData(data);
     setResMessage(message);
@@ -72,14 +71,13 @@ export async function HttpReq<T>(
     setLoading(false);
     setError(null);
   } catch (fetchError: any) {
-    setResData("" as T);
+    setResData({} as T); // Handle accordingly
     setResMessage("");
     setResId("");
     setLoading(false);
     setError(fetchError);
   }
 }
-
 
 export async function wSCall<T>(
   wSURL: string,
@@ -109,7 +107,7 @@ export async function wSCall<T>(
 
     websocket.onerror = function onError(event) {
       websocket.close();
-      console.error('WebSocket error:', event);
+      console.error("WebSocket error:", event);
       setResData("" as T);
       setResMessage("");
       setResId("");
@@ -118,10 +116,10 @@ export async function wSCall<T>(
     };
 
     websocket.onclose = function onClose() {
-      console.log('WebSocket connection closed');
+      console.log("WebSocket connection closed");
     };
   } catch (error) {
-    console.error('Error fetching businesses:', error);
+    console.error("Error fetching businesses:", error);
     setResData("" as T);
     setResMessage("");
     setResId("");
@@ -129,5 +127,3 @@ export async function wSCall<T>(
     setError(error as Event);
   }
 }
-
-

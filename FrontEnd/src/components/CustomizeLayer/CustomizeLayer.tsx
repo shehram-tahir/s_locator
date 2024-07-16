@@ -5,6 +5,7 @@ import { useLayerContext } from "../../context/LayerContext";
 import { useUIContext } from "../../context/UIContext";
 
 function CustomizeLayer() {
+  console.log("Rendering CustomizeLayer component"); // Log when the component renders
   const {
     setSecondFormData,
     handleNextStep,
@@ -12,6 +13,7 @@ function CustomizeLayer() {
     selectedColor,
     setSelectedColor,
   } = useLayerContext();
+
   const { closeModal } = useUIContext();
 
   const [legend, setLegend] = useState<string>("");
@@ -25,6 +27,7 @@ function CustomizeLayer() {
     >
   ) {
     const { name, value } = event.target;
+    console.log(`Field changed: ${name}, Value: ${value}`); // Log when a form field changes
     switch (name) {
       case "name":
         setName(value);
@@ -41,6 +44,7 @@ function CustomizeLayer() {
   }
 
   function validateForm() {
+    console.log("Validating form"); // Log when form validation occurs
     if (!name || !selectedColor || !legend || !description) {
       setError("All fields are required.");
       return false;
@@ -51,6 +55,7 @@ function CustomizeLayer() {
 
   function handleButtonClick() {
     if (validateForm()) {
+      console.log("Form is valid, proceeding to next step"); // Log when form is valid
       setSecondFormData({
         pointColor: selectedColor,
         legend,
@@ -63,6 +68,7 @@ function CustomizeLayer() {
   }
 
   function handleDiscardClick() {
+    console.log("Discarding form"); // Log when the form is discarded
     resetFormStage();
     closeModal();
   }

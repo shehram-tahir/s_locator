@@ -1,23 +1,30 @@
 import React, { ReactNode } from "react";
 
-// General Interfaces
 export interface ModalProps {
   children: React.ReactNode;
   darkBackground?: boolean;
   isSmaller?: boolean;
 }
 
-
 export interface FormData {
   selectedCountry: string;
   selectedCity: string;
   selectedCategory: string;
+  selectedSubcategory: string;
 }
-
-// Catalogue Interfaces
 
 export interface ExpandableMenuProps {
   children: ReactNode;
+}
+
+export interface MultipleLayersSettingProps {
+  layerIndex: number;
+}
+
+export interface SaveProducerLayerResponse {
+  message: string;
+  request_id: string;
+  data: string;
 }
 
 export interface Catalog {
@@ -30,6 +37,15 @@ export interface Catalog {
   can_access: boolean;
 }
 
+export interface UserLayer {
+  prdcer_ctlg_id: string;
+  prdcer_ctlg_name: string;
+  ctlg_description: string;
+  subscription_price: string;
+  ctlg_owner_user_id: string;
+  lyrs: string[];
+}
+
 export interface CatalogueCardProps {
   id: string;
   name: string;
@@ -38,9 +54,37 @@ export interface CatalogueCardProps {
   records_number: number;
   can_access: boolean;
   onMoreInfo(): void;
+  typeOfCard: string;
 }
 
-// Create Catalog Interfaces
+export interface CustomProperties {
+  name: string;
+  rating: number;
+  address: string;
+  phone: string;
+  website: string;
+  business_status: string;
+  user_ratings_total: number;
+}
+
+
+export interface UserLayerCardProps {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  typeOfCard: string;
+  onMoreInfo(
+    selectedCatalog: { id: string; name: string },
+    typeOfCard: string
+  ): void;
+}
+
+export interface CardItem {
+  id: string;
+  name: string;
+  typeOfCard: string;
+}
 
 // Catalog Context Type
 export interface CatalogContextType {
@@ -70,14 +114,47 @@ export interface CatalogContextType {
   setSelectedContainerType: React.Dispatch<
     React.SetStateAction<"Catalogue" | "Layer" | "Home">
   >;
-  handleAddClick(id: string, name: string): void;
-  handleSaveClick(): void;
+  handleAddClick(id: string, name: string, typeOfCard: string): void;
   handleSave(): void;
   resetFormStage(resetTo: string): void;
-  setSaveOption: React.Dispatch<React.SetStateAction<string>>;
+  geoPoints: FeatureCollection | string;
+  setGeoPoints: React.Dispatch<
+    React.SetStateAction<FeatureCollection | string>
+  >;
+  selectedColor: string;
+  setSelectedColor: React.Dispatch<React.SetStateAction<string>>;
+  selectedLayers: {
+    name: string;
+    id: string;
+    color: string;
+    is_zone_lyr: boolean;
+    display: boolean; // Add display property here
+  }[];
+  setSelectedLayers: React.Dispatch<
+    React.SetStateAction<
+      {
+        name: string;
+        id: string;
+        color: string;
+        is_zone_lyr: boolean;
+        display: boolean; // Add display property here
+      }[]
+    >
+  >;
+  updateLayerColor(layerIndex: number, newColor: string): void;
+  updateLayerZone(layerIndex: number, isZoneLayer: boolean): void;
+  currentlySelectedLayer: string | null;
+  setCurrentlySelectedLayer: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
+  setTempGeoPointsList: React.Dispatch<
+    React.SetStateAction<FeatureCollection[]>
+  >;
+  openDropdownIndex: number | null;
+  setOpenDropdownIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  updateLayerDisplay(layerIndex: number, display: boolean): void; // Add updateLayerDisplay method here
 }
 
-// Layer Context Types
 export interface City {
   name: string;
   lat: number;
@@ -96,6 +173,8 @@ export interface FirstFormResponse {
   message: string;
   request_id: string;
   data: FeatureCollection;
+  bknd_dataset_id: string;
+  prdcer_lyr_id: string;
 }
 
 export interface LayerContextType {
@@ -114,14 +193,13 @@ export interface LayerContextType {
     }>
   >;
   formStage: string;
-  isSaved: boolean;
-  isError: boolean;
+  isError: Error | null;
   firstFormResponse: string | FirstFormResponse;
   saveMethod: string;
   loading: boolean;
+  saveResponse: SaveProducerLayerResponse | null;
   setFormStage: React.Dispatch<React.SetStateAction<string>>;
-  setIsSaved: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsError: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsError: React.Dispatch<React.SetStateAction<Error | null>>;
   setFirstFormResponse: React.Dispatch<
     React.SetStateAction<string | FirstFormResponse>
   >;
@@ -133,7 +211,20 @@ export interface LayerContextType {
   colorOptions: string[];
   selectedColor: string;
   setSelectedColor: React.Dispatch<React.SetStateAction<string>>;
-  setSaveOption: React.Dispatch<React.SetStateAction<string>>; 
+  setSaveOption: React.Dispatch<React.SetStateAction<string>>;
+  datasetInfo: { bknd_dataset_id: string; prdcer_lyr_id: string } | null;
+  setDatasetInfo: React.Dispatch<
+    React.SetStateAction<{
+      bknd_dataset_id: string;
+      prdcer_lyr_id: string;
+    } | null>
+  >;
+  saveResponseMsg: string;
+  setSaveResponseMsg: React.Dispatch<React.SetStateAction<string>>;
+  setSaveResponse: React.Dispatch<
+    React.SetStateAction<SaveProducerLayerResponse | null>
+  >;
+  setSaveReqId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface ModalOptions {
@@ -155,8 +246,6 @@ export interface UIContextProps {
   setSidebarMode(mode: string): void;
 }
 
-
-// Map and GeoPoint Interfaces
 export interface GeoPoint {
   location: { lat: number; lng: number };
 }
@@ -171,6 +260,8 @@ export interface BoxmapProperties {
   website: string;
   business_status: string;
   user_ratings_total: number | string;
+  geoPointId: string;
+  color: string;
 }
 
 export interface Feature {
@@ -197,7 +288,6 @@ export interface FeatureCollection {
 //     };
 //   }
 
-// Ensure that the TabularData interface is included if it's used in your project
 export interface TabularData {
   formatted_address: string;
   name: string;

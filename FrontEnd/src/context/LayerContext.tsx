@@ -1,13 +1,25 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import { HttpReq } from "../services/apiService";
 import {
   FirstFormResponse,
   LayerContextType,
+  SaveProducerLayerResponse,
+  FeatureCollection,
 } from "../types/allTypesAndInterfaces";
+import urls from "../urls.json";
+import { useCatalogContext } from "./CatalogContext";
 
 const LayerContext = createContext<LayerContextType | undefined>(undefined);
 
 export function LayerProvider(props: { children: ReactNode }) {
   const { children } = props;
+  const { geoPoints, setGeoPoints } = useCatalogContext();
 
   const [secondFormData, setSecondFormData] = useState({
     pointColor: "",
@@ -18,12 +30,20 @@ export function LayerProvider(props: { children: ReactNode }) {
 
   const [formStage, setFormStage] = useState("initial");
   const [loading, setLoading] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [isError, setIsError] = useState<Error | null>(null);
   const [firstFormResponse, setFirstFormResponse] = useState<
     string | FirstFormResponse
   >("");
   const [saveMethod, setSaveMethod] = useState("");
+  const [datasetInfo, setDatasetInfo] = useState<{
+    bknd_dataset_id: string;
+    prdcer_lyr_id: string;
+  } | null>(null);
+
+  const [saveResponse, setSaveResponse] =
+    useState<SaveProducerLayerResponse | null>(null);
+  const [saveResponseMsg, setSaveResponseMsg] = useState("");
+  const [saveReqId, setSaveReqId] = useState("");
 
   // Define color options and selected color state
   const colorOptions = ["Red", "Green", "Blue", "Yellow", "Black"];
@@ -38,36 +58,69 @@ export function LayerProvider(props: { children: ReactNode }) {
     }
   }
 
+  useEffect(
+    function () {
+      if (firstFormResponse) {
+        setGeoPoints(firstFormResponse as string);
+      }
+    },
+    [firstFormResponse]
+  );
+
+  useEffect(() => {
+    if (geoPoints && typeof geoPoints !== "string") {
+      const updatedGeoPoints: FeatureCollection = {
+        ...geoPoints,
+        features: geoPoints.features.map((feature) => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            color: selectedColor.toLowerCase(),
+          },
+        })),
+      };
+      setGeoPoints(updatedGeoPoints);
+    }
+  }, [selectedColor]);
+
   // Function to handle the save operation, simulating an API call
   function handleSave() {
-    const saveData = {
-      firstFormResponse,
-      secondFormData,
-      saveMethod,
-    };
+    if (!datasetInfo) {
+      setIsError(new Error("Dataset information is missing!"));
+      console.error("Dataset information is missing!");
+      return;
+    }
 
-    console.log("Starting save process with the following data:", saveData);
+    const userId = "1845e047-9632-4243-aadf-041bfb7a7f1f"; // Hardcoded user ID
+
+    const postData = {
+      prdcer_layer_name: secondFormData.name,
+      prdcer_lyr_id: datasetInfo.prdcer_lyr_id,
+      bknd_dataset_id: datasetInfo.bknd_dataset_id,
+      points_color: secondFormData.pointColor,
+      layer_legend: secondFormData.legend,
+      layer_description: secondFormData.description,
+      user_id: userId,
+    };
 
     setLoading(true);
 
-    // Simulate an API call with a timeout
-    setTimeout(function () {
-      setLoading(false);
-      const isSuccess = true;
-      if (isSuccess) {
-        setIsSaved(true);
-        console.log("Save successful!");
-      } else {
-        setIsError(true);
-        console.error("Save failed!");
-      }
-    }, 1000);
+    // Perform the API call
+    HttpReq<SaveProducerLayerResponse>(
+      urls.save_producer_layer,
+      setSaveResponse,
+      setSaveResponseMsg,
+      setSaveReqId,
+      setLoading,
+      setIsError,
+      "post",
+      postData
+    );
   }
 
   // Function to reset the form stage and related state
   function resetFormStage() {
-    setIsSaved(false);
-    setIsError(false);
+    setIsError(null);
     setFormStage("initial");
   }
 
@@ -77,13 +130,12 @@ export function LayerProvider(props: { children: ReactNode }) {
         secondFormData,
         setSecondFormData,
         formStage,
-        isSaved,
         isError,
         firstFormResponse,
         saveMethod,
         loading,
+        saveResponse,
         setFormStage,
-        setIsSaved,
         setIsError,
         setFirstFormResponse,
         setSaveMethod,
@@ -94,7 +146,13 @@ export function LayerProvider(props: { children: ReactNode }) {
         colorOptions,
         selectedColor,
         setSelectedColor,
-        setSaveOption: setSaveMethod, // Ensure setSaveOption is available
+        setSaveOption: setSaveMethod,
+        datasetInfo,
+        setDatasetInfo,
+        saveResponseMsg,
+        setSaveResponseMsg,
+        setSaveResponse,
+        setSaveReqId,
       }}
     >
       {children}
