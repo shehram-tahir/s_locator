@@ -1,6 +1,10 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
 import { HttpReq } from "../../services/apiService";
 import {
+  formatSubcategoryName,
+  processData,
+} from "../../utils/helperFunctions";
+import {
   City,
   FirstFormResponse,
   FormData,
@@ -11,12 +15,14 @@ import { useLayerContext } from "../../context/LayerContext";
 import urls from "../../urls.json";
 
 function LayerDetailsForm() {
-  const { handleNextStep, setFirstFormResponse, loading } = useLayerContext();
+  const { handleNextStep, setFirstFormResponse, loading, setDatasetInfo } =
+    useLayerContext();
 
   const [firstFormData, setFirstFormData] = useState<FormData>({
     selectedCountry: "",
     selectedCity: "",
     selectedCategory: "",
+    selectedSubcategory: "",
   });
 
   const [countries, setCountries] = useState<string[]>([]);
@@ -25,6 +31,10 @@ function LayerDetailsForm() {
     {}
   );
   const [categories, setCategories] = useState<string[]>([]);
+  const [subcategories, setSubcategories] = useState<string[]>([]);
+  const [categoriesData, setCategoriesData] = useState<{
+    [category: string]: string[];
+  }>({});
   const [localLoading, setLocalLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -40,20 +50,11 @@ function LayerDetailsForm() {
   const [postResMessage, setPostResMessage] = useState<string>("");
   const [postResId, setPostResId] = useState<string>("");
 
-  function processCountries(data: any): string[] {
-    if (typeof data === "object" && data !== null) {
-      const countryNames = Object.keys(data);
-      setCitiesData(data);
-      return countryNames;
-    }
-    return [];
-  }
-
   function fetchData() {
     HttpReq<string[]>(
       urls.country_city,
       function (data) {
-        setCountries(processCountries(data));
+        setCountries(processData(data, setCitiesData));
       },
       setCityResMessage,
       setCityResId,
@@ -62,9 +63,9 @@ function LayerDetailsForm() {
     );
 
     HttpReq<string[]>(
-      urls.old_nearby_categories,
+      urls.nearby_categories,
       function (data) {
-        setCategories(data as string[]);
+        setCategories(processData(data, setCategoriesData));
       },
       setCategoriesResMessage,
       setCategoriesResId,
@@ -79,7 +80,7 @@ function LayerDetailsForm() {
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>) {
     const { name, value } = event.target;
-    setFirstFormData(function (prevData: FormData) {
+    setFirstFormData(function (prevData) {
       return {
         ...prevData,
         [name]: value,
@@ -89,10 +90,19 @@ function LayerDetailsForm() {
     if (name === "selectedCountry") {
       const selectedCountryCities = citiesData[value] || [];
       setCities(selectedCountryCities);
-      setFirstFormData(function (prevData: FormData) {
+      setFirstFormData(function (prevData) {
         return {
           ...prevData,
           selectedCity: "", // Reset selected city when country changes
+        };
+      });
+    } else if (name === "selectedCategory") {
+      const selectedSubcategories = categoriesData[value] || [];
+      setSubcategories(selectedSubcategories);
+      setFirstFormData(function (prevData) {
+        return {
+          ...prevData,
+          selectedSubcategory: "", // Reset selected subcategory when category changes
         };
       });
     }
@@ -102,7 +112,8 @@ function LayerDetailsForm() {
     if (
       !firstFormData.selectedCountry ||
       !firstFormData.selectedCity ||
-      !firstFormData.selectedCategory
+      !firstFormData.selectedCategory ||
+      !firstFormData.selectedSubcategory
     ) {
       setError(new Error("All fields are required."));
       return false;
@@ -118,16 +129,32 @@ function LayerDetailsForm() {
   }
 
   function handleFirstFormApiCall(action: string) {
+    const selectedCity = cities.find(function (city) {
+      return city.name === firstFormData.selectedCity;
+    });
+
+    if (!selectedCity) {
+      setError(new Error("Selected city not found."));
+      return;
+    }
+
     const postData = {
-      lat: 37.7937,
-      lng: -122.3965,
-      radius: 1000,
-      type: "convenience_store",
+      dataset_category: firstFormData.selectedSubcategory,
+      dataset_country: firstFormData.selectedCountry,
+      dataset_city: firstFormData.selectedCity,
     };
 
     HttpReq<FirstFormResponse>(
-      urls.http_single_nearby,
-      setFirstFormResponse,
+      urls.create_layer,
+      function (response) {
+        setFirstFormResponse(response as FirstFormResponse); // Type assertion
+        if (response.bknd_dataset_id && response.prdcer_lyr_id) {
+          setDatasetInfo({
+            bknd_dataset_id: response.bknd_dataset_id,
+            prdcer_lyr_id: response.prdcer_lyr_id,
+          });
+        }
+      },
       setPostResMessage,
       setPostResId,
       setLocalLoading,
@@ -206,6 +233,30 @@ function LayerDetailsForm() {
             return (
               <option key={category} value={category}>
                 {category}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      <div className={styles.formGroup}>
+        <label className={styles.label} htmlFor="subcategory">
+          Subcategory:
+        </label>
+        <select
+          id="subcategory"
+          name="selectedSubcategory"
+          className={styles.select}
+          value={firstFormData.selectedSubcategory}
+          onChange={handleChange}
+          disabled={!firstFormData.selectedCategory}
+        >
+          <option value="" disabled>
+            Select a subcategory
+          </option>
+          {subcategories.map(function (subcategory) {
+            return (
+              <option key={subcategory} value={subcategory}>
+                {formatSubcategoryName(subcategory)}
               </option>
             );
           })}

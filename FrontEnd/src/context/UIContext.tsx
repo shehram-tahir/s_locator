@@ -33,9 +33,9 @@ export function UIProvider({ children }: { children: ReactNode }) {
   } = useCatalogContext();
 
   const {
-    isSaved: layerIsSaved,
+    saveResponse: layerIsSaved,
     isError: layerIsError,
-    setIsSaved: setLayerIsSaved,
+    setSaveResponse: setLayerIsSaved,
     setIsError: setLayerIsError,
     setFormStage,
   } = useLayerContext();
@@ -66,10 +66,10 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
     // Reset LayerContext states if applicable
     if (layerIsSaved) {
-      setLayerIsSaved(false);
+      setLayerIsSaved(null);
     }
     if (layerIsError) {
-      setLayerIsError(false);
+      setLayerIsError(null);
     }
   }
 

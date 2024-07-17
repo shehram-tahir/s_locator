@@ -4,71 +4,96 @@
   width: 100%;
 }
 
+.selectContainerContext {
+  width: 50px;
+}
+
 .customSelectValue {
   display: flex;
   align-items: center;
-  cursor: pointer;
-  padding: 8px;
+  justify-content: space-between;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  justify-content: space-between;
-  position: relative;
-  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.noBorder {
+  border: none;
+  padding: 0;
+}
+
+.selectedText {
+  font-weight: bold;
+}
+
+.placeholder {
+  color: #aaa;
 }
 
 .colorCircle {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  margin-left: 8px;
   position: absolute;
-  left: 70px;
+  left: 80px;
+}
+
+.colorCircleCatalog {
+  position: static;
+  width: 18px;
+  height: 18px;
+  margin-left: 18px;
+}
+
+.colorCatalog {
+  width: 18px;
+  height: 18px;
+  position: static;
 }
 
 .arrowIcon {
-  margin-left: 8px;
-  transition: transform 0.3s ease;
+  font-size: 24px;
 }
 
-.arrowIcon.open {
+.open {
   transform: rotate(180deg);
 }
 
 .customSelectOptions {
   position: absolute;
-  top: calc(100% + 4px);
+  top: 100%;
   left: 0;
   right: 0;
-  z-index: 1;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  max-height: 200px;
-  overflow-y: auto;
+  background-color: #fff;
+  z-index: 1;
 }
 
 .customSelectOption {
-  padding: 8px;
+  padding: 10px;
+  margin: 0 auto;
   cursor: pointer;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  transition: background-color 0.2s ease;
+  align-items: center;
+}
+
+.CatalogueSelectOptions {
+  max-width: 45px;
+  left: 4px;
+  top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 0;
 }
 
 .customSelectOption:hover {
   background-color: #f0f0f0;
 }
 
-.placeholder {
-  color: #999;
-}
-
-.selectedText {
-  color: #333;
-}
-
 .optionText {
-  flex-grow: 1;
+  margin-right: 10px;
 }
