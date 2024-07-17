@@ -9,7 +9,9 @@ import glob
 import re
 import pandas as pd
 import numpy as np
-
+import pandas as pd
+import os
+import pickle
 
 
 def clean_key(key):
@@ -201,19 +203,36 @@ def is_boolean_or_binary(series):
     )
 
 
+
+
 def process_and_filter_data(directory, all_keys, num_files=350):
-    json_files = glob.glob(os.path.join(directory, "*_response_data.json"))
-    data = []
+    # Define the path for the saved DataFrame
+    df_save_path = os.path.join(directory, 'processed_dataframe.pkl')
 
-    for file_path in json_files[:num_files]:
-        with open(file_path, "r", encoding="utf-8") as file:
-            file_data = json.load(file)
-            for url, listing_data in file_data.items():
-                flattened = flatten_json(listing_data)
-                flattened["url"] = url
-                data.append(flattened)
+    # Check if the processed DataFrame already exists
+    if os.path.exists(df_save_path):
+        print("Loading existing processed DataFrame...")
+        with open(df_save_path, 'rb') as f:
+            df = pickle.load(f)
+    else:
+        print("Processing data and creating new DataFrame...")
+        json_files = glob.glob(os.path.join(directory, "*_response_data.json"))
+        data = []
 
-    df = pd.DataFrame(data)
+        for file_path in json_files[:num_files]:
+            with open(file_path, "r", encoding="utf-8") as file:
+                file_data = json.load(file)
+                for url, listing_data in file_data.items():
+                    flattened = flatten_json(listing_data)
+                    flattened["url"] = url
+                    data.append(flattened)
+
+        df = pd.DataFrame(data)
+
+        # Save the DataFrame
+        with open(df_save_path, 'wb') as f:
+            pickle.dump(df, f)
+        print(f"DataFrame saved to {df_save_path}")
 
     # Choose specific columns and drop others
     columns_to_drop = [
