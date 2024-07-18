@@ -12,6 +12,9 @@ ssh_config
 
 /node_modules
 
+.DS_Store
+
+
 # profiling files
 chrome-profiler-events.json
 speed-measure-plugin.json
