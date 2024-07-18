@@ -1,3 +1,0 @@
-// DataviewComponent.tsx
-export {}
-

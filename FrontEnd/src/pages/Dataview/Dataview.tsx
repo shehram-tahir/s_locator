@@ -4,6 +4,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import { FaImages } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
+import { useCatalogContext } from "../../context/CatalogContext";
 import { TabularData, Feature } from '../../types/allTypesAndInterfaces';
 import { useGetData } from '../../context/AppDataContext';
 import "ag-grid-community/styles/ag-grid.css";
@@ -38,25 +39,30 @@ export const columnDefs: ColDef<TabularData>[] = [
   },
 ];
 
+
 export function mapFeatureToTabularData(feature: Feature): TabularData {
   return {
     name: feature.properties.name,
     formatted_address: feature.properties.address,
     website: feature.properties.website,
-    rating: Number(feature.properties.rating), 
-    user_ratings_total: Number(feature.properties.user_ratings_total), 
+    rating: Number(feature.properties.rating),
+    user_ratings_total: Number(feature.properties.user_ratings_total),
   };
-};
+}
 
 const Dataview: React.FC = () => {
   const [businesses, setBusinesses] = useState<TabularData[]>([]);
-
-  const x = useGetData("geoPoints");
+  const { geoPoints } = useCatalogContext();
 
   useEffect(() => {
-    const tabularData = x.features.map(mapFeatureToTabularData);
-    setBusinesses(tabularData);
-  }, [x]);
+    if (geoPoints && typeof geoPoints !== "string"){
+      const tabularData = geoPoints.features.map(mapFeatureToTabularData);
+      setBusinesses(tabularData);
+    } else {
+      // Use a default value when x is undefined or doesn't have features
+      setBusinesses([]);
+    }
+  }, [geoPoints]);
 
   return (
     <div
