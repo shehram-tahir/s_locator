@@ -135,10 +135,10 @@ def generate_insert_sql(url, flattened_data, all_keys):
     column_names = ", ".join(f'{col.lower()}' for col in columns)
 
     sql = f"""
-    INSERT INTO norm_listings ({column_names})
+    INSERT INTO riyadh_villa_allrooms ({column_names})
     VALUES ({placeholders})
     ON CONFLICT (url) DO UPDATE
-    SET {', '.join([f'"{col.lower()}" = EXCLUDED."{col.lower()}"' for col in columns])};
+    SET {', '.join([f'{col.lower()} = EXCLUDED.{col.lower()}' for col in columns])};
     """
 
     return sql, tuple(values)
@@ -362,9 +362,9 @@ def main():
 
         # Use the filtered DataFrame to create the table
         create_table_sql = f"""
-        CREATE TABLE IF NOT EXISTS norm_listings (
+        CREATE TABLE IF NOT EXISTS riyadh_villa_allrooms (
             url TEXT PRIMARY KEY,
-            {', '.join([f'"{col}" TEXT' for col in columns if col != 'url'])},
+            {', '.join([f'{col.lower()} TEXT' for col in columns if col != 'url'])},
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
