@@ -105,12 +105,23 @@ def get_all_keys(directory, num_files=50):
     return list_all_keys
 
 
+def move_to_front(lst, items_to_move):
+    front_items = [item for item in items_to_move if item in lst]
+    remaining_items = [item for item in lst if item not in items_to_move]
+    return front_items + remaining_items
+
+
 def generate_insert_sql(url, flattened_data, all_keys):
+    items_to_move = ["price",
+                     "additional__WebListing_uri___location_lat", 
+                     "additional__WebListing_uri___location_lng"]
+    all_keys = move_to_front(all_keys, items_to_move)
     columns = (
         ["url"]
-        + list(all_keys)
-        + ["original_specifications", "original_additional_data"]
+        + all_keys
     )
+    all_keys.remove("original_specifications")
+    all_keys.remove("original_additional_data")
     values = [url]
     values.extend([flattened_data.get(key, None) for key in all_keys])
     values.extend(
@@ -121,13 +132,13 @@ def generate_insert_sql(url, flattened_data, all_keys):
     )
 
     placeholders = ", ".join(["%s"] * len(columns))
-    column_names = ", ".join(f'"{col}"' for col in columns)
+    column_names = ", ".join(f'{col.lower()}' for col in columns)
 
     sql = f"""
     INSERT INTO norm_listings ({column_names})
     VALUES ({placeholders})
     ON CONFLICT (url) DO UPDATE
-    SET {', '.join([f'"{col}" = EXCLUDED."{col}"' for col in columns if col != 'url'])};
+    SET {', '.join([f'"{col.lower()}" = EXCLUDED."{col.lower()}"' for col in columns])};
     """
 
     return sql, tuple(values)
@@ -167,21 +178,21 @@ def process_and_insert_data(directory, cursor, all_keys, limit=3):
                 continue
 
             flattened = flatten_json(listing_data)
-            sql, values = generate_insert_sql(url, flattened, all_keys)
+            sql, values = generate_insert_sql(url, flattened, [col for col in all_keys if col !="url"])
             sql_statements.append((sql, values))
 
         if not sql_statements:
             print(f"Skipping file with no valid data: {file_path}")
             continue
 
+        # Execute SQL statements
+        for sql, values in sql_statements:
+            cursor.execute(sql, values)
+
         # Save SQL statements to log file
         with open(log_file, "w", encoding="utf-8") as log:
             for sql, values in sql_statements:
                 log.write(f"{sql}\n{values}\n\n")
-
-        # Execute SQL statements
-        for sql, values in sql_statements:
-            cursor.execute(sql, values)
 
         processed_files.add(file_path)
         print(f"Processed file: {file_path}")
@@ -206,6 +217,11 @@ def is_boolean_or_binary(series):
 
 
 def process_and_filter_data(directory, all_keys, num_files=350):
+    all_col_names_path = r"G:\My Drive\Personal\Work\offline\Jupyter\Git\s_locator\storage\postgres\process_and_filter_data.json"
+    if os.path.exists(all_col_names_path):
+        with open(all_col_names_path, "r", encoding="utf-8") as file:
+            json_obj = json.load(file)
+            return json_obj["sorted_new_keep_cols"]
     # Define the path for the saved DataFrame
     df_save_path = os.path.join(directory, 'processed_dataframe.pkl')
 
@@ -234,7 +250,12 @@ def process_and_filter_data(directory, all_keys, num_files=350):
             pickle.dump(df, f)
         print(f"DataFrame saved to {df_save_path}")
 
+    if len(df.columns)>len(all_keys):
+        all_keys.extend(df.columns)
+        all_keys = list(set(all_keys))
+
     # Choose specific columns and drop others
+    print("Dropping unnecessary columns...")
     columns_to_drop = [
         "additional_rops_path_listing_location_lat",
         "additional_lasticWebListing__location_lat",
@@ -243,35 +264,42 @@ def process_and_filter_data(directory, all_keys, num_files=350):
         "additional_lasticWebListing__location_lng",
         "additional_ended_details_national_address_longitude",
     ]
-    df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
 
+    
+    spec_cols =  [col for col in all_keys if "specifications" in col]
+    non_spec_cols= [col for col in all_keys if col not in spec_cols ]
+    df = df.drop(columns=[col for col in columns_to_drop if col in non_spec_cols])
+
+    print("Selecting columns to keep...")
     value_counts = df.nunique() / len(df)
     columns_to_keep = [
         col
         for col in df.columns
-        if value_counts[col] >= 0.00000005
-        or contains_arabic(col)
+        if value_counts[col] >= 0.00015
         or is_boolean_or_binary(df[col])
-        or any(contains_arabic(str(val)) for val in df[col].dropna())
     ]
     columns_to_keep.extend([
         "additional__WebListing_uri___location_lat",
         "additional__WebListing_uri___location_lng",
     ])
+
     df = df[columns_to_keep]
 
-    # Drop columns with 'video' in the name
+    # Drop columns with 'video' or 'img' in the name
+    print("Dropping columns with 'video' or 'img' in the name...")
     df = df.drop(columns=[col for col in df.columns if "video" in col.lower()])
     df = df.drop(columns=[col for col in df.columns if "img" in col.lower()])
 
 
     # Drop columns where more than 50% of values contain more than 3 '/' or '\'
+    print("Dropping columns with excessive slashes...")
     slash_mask = np.vectorize(lambda x: str(x).count('/') + str(x).count('\\') > 3)(df.values)
     slash_cols = df.columns[np.mean(slash_mask, axis=0) > 0.5]
     https_mask = np.vectorize(lambda x: str(x).startswith('https:'))(df[slash_cols].values)
     slash_cols = slash_cols[~np.any(https_mask, axis=0)]
     df = df.drop(columns=slash_cols)
     if "additional_rops_pageProps_path_listing_id" in df.columns:
+        print("Dropping columns related to 'additional_rops_pageProps_path_listing_id'...")
         listing_id_col = df["additional_rops_pageProps_path_listing_id"].astype(str)
         id_mask = np.vectorize(lambda x: str(x) in listing_id_col.values)(df.values)
         id_cols = df.columns[np.mean(id_mask, axis=0) > 0.5]
@@ -279,35 +307,48 @@ def process_and_filter_data(directory, all_keys, num_files=350):
 
 
     # Keep only the columns that are in all_keys plus 'url'
-    df = df[["url"] + [col for col in all_keys if col in df.columns]]
+    print("Keeping only the required columns...")
+    df = df[["url", "price"] + [col for col in all_keys if col in df.columns]]
     new_keep_cols = df.columns.tolist()
 
     # Sort the columns
-    # First, separate columns with Arabic characters
-    arabic_cols = [col for col in new_keep_cols if contains_arabic(col)]
+    print("Sorting the columns...")
+
+    arabic_cols = [col for col in new_keep_cols if "specifications" in col]
     non_arabic_cols = [col for col in new_keep_cols if col not in arabic_cols]
-
-    # Sort Arabic columns alphabetically
-    arabic_cols.sort()
-
-    # Sort non-Arabic columns by number of unique values, in descending order
-    non_arabic_cols.sort(key=lambda col: df[col].nunique(), reverse=True)
-
     # Combine the sorted lists, with Arabic columns first
-    sorted_new_keep_cols = arabic_cols + non_arabic_cols
+    sorted_new_keep_cols = arabic_cols+ spec_cols + non_arabic_cols
+    re_spec_cols = list(set([col for col in sorted_new_keep_cols if "specifications" in col]))
+    re_nonspec_cols = list(set([col for col in sorted_new_keep_cols if "specifications" not in col]))
+    re_nonspec_cols.remove("url")
+    re_nonspec_cols.remove("price")
+    sorted_new_keep_cols = ["url","price"] + re_spec_cols + re_nonspec_cols
+
+    output_data = {"sorted_new_keep_cols": sorted_new_keep_cols}
+    with open(all_col_names_path, "w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=4, ensure_ascii=False)
+    print(f"Data saved to: {all_col_names_path}")
 
     return sorted_new_keep_cols
 
 
 def main():
     try:
+        # conn = psycopg2.connect(
+        #     dbname="aqar_scraper",
+        #     user="scraper_user",
+        #     password="scraper_password",
+        #     host="localhost",
+        #     port="5432",
+        # )
         conn = psycopg2.connect(
             dbname="aqar_scraper",
             user="scraper_user",
             password="scraper_password",
-            host="localhost",
+            host="s-locator.northernacs.com",
             port="5432",
         )
+
         cursor = conn.cursor()
 
         directory = "G:\\My Drive\\Personal\\Work\\offline\\Jupyter\\Git\\testwebscraping\\riyadh_villa_allrooms"
@@ -317,6 +358,7 @@ def main():
 
         # Process and filter data
         columns = process_and_filter_data(directory, all_keys)
+        columns.extend(["original_specifications", "original_additional_data"])
 
         # Use the filtered DataFrame to create the table
         create_table_sql = f"""
@@ -326,6 +368,7 @@ def main():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
+        
         cursor.execute(create_table_sql)
 
         # Process and insert data
@@ -335,11 +378,6 @@ def main():
         print(
             f"Data processing and insertion completed successfully. Processed {len(processed_files)} files."
         )
-
-        # Save list of processed files
-        with open(os.path.join(directory, "processed_files.txt"), "a") as f:
-            for file in processed_files:
-                f.write(f"{datetime.now().isoformat()}: {file}\n")
 
     except Exception as e:
         print(f"An error occurred: {e}")
