@@ -2,6 +2,8 @@
 	path = my_middle_API
 	url = https://github.com/abdullahalhoothy/backend2.git
 	branch = main
+	
 [submodule "FrontEnd"]
-	path = FrontEnd
-	url = https://github.com/abdullahalhoothy/FrontEnd.git
+    path = FrontEnd
+    url = https://github.com/abdullahalhoothy/FrontEnd.git
+    branch = main
