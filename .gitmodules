@@ -1,3 +1,4 @@
 [submodule "my_middle_API"]
 	path = my_middle_API
 	url = https://github.com/abdullahalhoothy/backend2.git
+	branch = main
