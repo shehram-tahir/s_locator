@@ -6,10 +6,10 @@ pc_venv/
 **/.idea/
 **/.env
 **/secret*
-
+husain_videos/**
 mykeys*
 ssh_config
-
+storage/postgres/sql_logs/**
 /node_modules
 
 .DS_Store

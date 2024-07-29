@@ -372,7 +372,7 @@ def main():
         cursor.execute(create_table_sql)
 
         # Process and insert data
-        processed_files = process_and_insert_data(directory, cursor, columns, limit=3)
+        processed_files = process_and_insert_data(directory, cursor, columns, limit=100)
 
         conn.commit()
         print(
