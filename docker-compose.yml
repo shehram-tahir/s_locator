@@ -15,6 +15,7 @@ services:
       context: ./my_middle_API
     ports:
       - "8000:8000"
+      - "7000:7000"
     networks:
       - myinternalnetwork
 
