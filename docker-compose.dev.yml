@@ -1,26 +1,24 @@
-
+version: '3'
 services:
   dev_frontend:
-    build:
-      context: ./FrontEnd
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
     ports:
       - "3001:3000"
     depends_on:
       - dev_middle_api
     networks:
       - dev_myinternalnetwork
-    
+   
   dev_middle_api:
-    build:
-      context: ./my_middle_API
+    image: ghcr.io/${GITHUB_REPOSITORY}/middle-api:latest
     ports:
-      - "8001:8000"
+      - "8001:8001"
       - "7001:7000"
     networks:
       - dev_myinternalnetwork
 
   dev_db:
-    build: ./storage/postgres
+    image: ghcr.io/${GITHUB_REPOSITORY}/db:latest
     environment:
       POSTGRES_DB: aqar_scraper
       POSTGRES_USER: scraper_user
@@ -43,7 +41,6 @@ services:
       - dev_db
     networks:
       - dev_myinternalnetwork
-
 
 networks:
   dev_myinternalnetwork:

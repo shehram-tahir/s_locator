@@ -6,7 +6,6 @@ on:
 
 env:
   GITHUB_REPOSITORY: ${{ github.repository }}
-  GITHUB_SHA: ${{ github.sha }}
 
 jobs:
   build-and-deploy:
@@ -43,29 +42,21 @@ jobs:
       with:
         context: ./FrontEnd
         push: true
-        tags: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+        tags: ghcr.io/${{ github.repository }}/frontend:latest
 
     - name: Build and push Middle API image
       uses: docker/build-push-action@v2
       with:
         context: ./my_middle_API
         push: true
-        tags: ghcr.io/${{ github.repository }}/middle-api:${{ github.sha }}
+        tags: ghcr.io/${{ github.repository }}/middle-api:latest
 
     - name: Build and push DB image
       uses: docker/build-push-action@v2
       with:
         context: ./storage/postgres
         push: true
-        tags: ghcr.io/${{ github.repository }}/db:${{ github.sha }}
-
-    - name: Build and push PgAdmin image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: ./Dockerfile.pgadmin
-        push: true
-        tags: ghcr.io/${{ github.repository }}/pgadmin:${{ github.sha }}
+        tags: ghcr.io/${{ github.repository }}/db:latest
 
     - name: Deploy to VPS
       uses: appleboy/ssh-action@master
