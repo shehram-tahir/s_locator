@@ -71,7 +71,7 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          cd s_locator
+          cd /root/s_locator
           git pull
           docker-compose -f docker-compose.dev.yml down
           docker-compose -f docker-compose.dev.yml pull
