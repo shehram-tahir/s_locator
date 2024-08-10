@@ -44,7 +44,7 @@ jobs:
             cd s_locator
           fi
 
-        # Create secrets directory if it doesn't exist
+          # Create secrets directory if it doesn't exist
           mkdir -p my_middle_API/secrets
 
           # Create secret files
