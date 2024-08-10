@@ -43,7 +43,10 @@ jobs:
             git clone --recursive https://github.com/abdullahalhoothy/s_locator.git
             cd s_locator
           fi
-          
+
+        # Create secrets directory if it doesn't exist
+          mkdir -p my_middle_API/secrets
+
           # Create secret files
           echo '${{ secrets.FIREBASE_ADMIN_SDK }}' > my_middle_API/secrets/secret_fir-locator-35839-firebase-adminsdk-yb6f6-a5b81519d9.json
           echo '${{ secrets.SECRETS_JSON }}' > my_middle_API/secrets/secrets.json
