@@ -36,9 +36,10 @@ jobs:
           # Clone or update the repository
           if [ -d "s_locator" ]; then
             cd s_locator
-            git pull
-            git submodule update --remote --recursive --merge
-            git submodule foreach 'git checkout main && git pull origin main'
+            git fetch --all
+            git reset --hard origin/main
+            git submodule update --init --recursive
+            git submodule foreach 'git fetch --all && git reset --hard origin/main'
           else
             git clone --recursive https://github.com/abdullahalhoothy/s_locator.git
             cd s_locator
