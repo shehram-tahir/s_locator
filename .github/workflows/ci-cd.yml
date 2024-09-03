@@ -19,13 +19,14 @@ jobs:
       uses: appleboy/ssh-action@master
       env:
         FIREBASE_ADMIN_SDK: ${{ secrets.FIREBASE_ADMIN_SDK }}
-        SECRETS_JSON: ${{ secrets.SECRETS_JSON }}
+        SECRETS_GMAP: ${{ secrets.SECRETS_GMAP }}
+        SECRETS_FIREBASE: ${{ secrets.SECRETS_FIREBASE }}
         FRONTEND_ENV: ${{ secrets.FRONTEND_ENV }}
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USERNAME }}
         key: ${{ secrets.VPS_SSH_KEY }}
-        envs: FIREBASE_ADMIN_SDK,SECRETS_JSON,FRONTEND_ENV
+        envs: FIREBASE_ADMIN_SDK,SECRETS_GMAP,SECRETS_FIREBASE,FRONTEND_ENV
         script: |
           cd s_locator
           docker-compose down
@@ -43,7 +44,8 @@ jobs:
 
           # Create secret files
           echo '${{ secrets.FIREBASE_ADMIN_SDK }}' > my_middle_API/secrets/secret_fir-locator-35839-firebase-adminsdk-yb6f6-a5b81519d9.json
-          echo '${{ secrets.SECRETS_JSON }}' > my_middle_API/secrets/secrets.json
+          echo '${{ secrets.SECRETS_GMAP }}' > my_middle_API/secrets/secrets_gmap.json
+          echo '${{ secrets.SECRETS_FIREBASE }}' > my_middle_API/secrets/secrets_firebase.json
           echo '${{ secrets.FRONTEND_ENV }}' > FrontEnd/.env
 
           # Replace values in files
