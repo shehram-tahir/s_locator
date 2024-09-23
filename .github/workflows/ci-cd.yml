@@ -29,45 +29,61 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         envs: FIREBASE_ADMIN_SDK,SECRETS_GMAP,SECRETS_FIREBASE,FRONTEND_ENV,SECRET_DATABASE_ENV
         script: |
+          set -x  # Enable debug mode
+          
+          echo "Starting deployment process..."
+          
           cd s_locator
           docker compose down
+          echo "Docker compose down completed."
+          
           cd ..
           rm -rf s_locator
-
+          echo "Removed existing s_locator directory."
+          
           # Clone the repository and update submodules
-          git clone --recursive https://github.com/abdullahalhoothy/s_locator.git && 
-          cd s_locator && 
-          git submodule update --remote --recursive --merge && 
+          git clone --recursive https://github.com/abdullahalhoothy/s_locator.git &&
+          cd s_locator &&
+          git submodule update --remote --recursive --merge &&
           git submodule foreach 'git checkout main && git pull origin main'
-
+          echo "Repository cloned and submodules updated."
+          
           # Create secrets directory if it doesn't exist
           mkdir -p my_middle_API/secrets
           mkdir -p storage/secrets
-
+          echo "Secret directories created."
+          
           # Create secret files
           echo '${{ secrets.FIREBASE_ADMIN_SDK }}' > my_middle_API/secrets/secret_fir-locator-35839-firebase-adminsdk-yb6f6-a5b81519d9.json
           echo '${{ secrets.SECRETS_GMAP }}' > my_middle_API/secrets/secrets_gmap.json
           echo '${{ secrets.SECRETS_FIREBASE }}' > my_middle_API/secrets/secrets_firebase.json
           echo '${{ secrets.SECRET_DATABASE_ENV }}' > storage/secrets/secrets_database.env
           echo '${{ secrets.FRONTEND_ENV }}' > FrontEnd/.env
-
+          echo "Secret files created."
+          
           # Replace values in files
           sed -i 's|"REACT_APP_API_URL": "http://localhost:8000/fastapi"|"REACT_APP_API_URL": "https://s-locator.northernacs.com/fastapi"|g' FrontEnd/src/urls.json
           sed -i 's|enable_CORS_url: str = "http://localhost:3000"|enable_CORS_url: str = "https://s-locator.northernacs.com"|g' my_middle_API/config_factory.py
           sed -i 's|uvicorn.run(app, host="localhost", port=8000)|uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)|g' my_middle_API/run_apps.py
           sed -i 's|dsn: str = "postgresql://scraper_user:scraper_password@s-locator.northernacs.com:5432/aqar_scraper"|dsn: str = "postgresql://scraper_user:scraper_password@db:5432/aqar_scraper"|g' my_middle_API/database.py
-          
-
-          ## install jq
+          echo "Configuration files updated."
+         
+          # Install jq
           apt-get update && apt-get install -y jq
-
-          ## for Backup
+          echo "jq installed."
+          
+          # For Backup
           touch /backup.sh
           cp ./backup.sh /backup.sh
-
           chmod 777 backup_setup.sh
           ./backup_setup.sh
-
+          echo "Backup setup completed."
+          
           # Build and run Docker containers
           docker compose build
+          echo "Docker compose build completed."
+          
           docker compose up -d
+          echo "Docker compose up completed."
+          
+          echo "Deployment process finished."
