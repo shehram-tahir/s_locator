@@ -28,10 +28,14 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         envs: FIREBASE_ADMIN_SDK,SECRETS_GMAP,SECRETS_FIREBASE,FRONTEND_ENV
         script: |
-          cd s_locator
-          docker-compose down
-          cd ..
-          rm -rf s_locator
+          if [ -d "s_locator" ]; then
+            cd s_locator
+            docker compose down
+            cd ..
+            rm -rf s_locator
+          else
+            echo "doesn't exist, then it the first time"
+          fi
 
           # Clone the repository and update submodules
           git clone --recursive https://github.com/abdullahalhoothy/s_locator.git && 
@@ -54,6 +58,21 @@ jobs:
           sed -i 's|uvicorn.run(app, host="localhost", port=8000)|uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)|g' my_middle_API/run_apps.py
           sed -i 's|dsn: str = "postgresql://scraper_user:scraper_password@s-locator.northernacs.com:5432/aqar_scraper"|dsn: str = "postgresql://scraper_user:scraper_password@db:5432/aqar_scraper"|g' my_middle_API/database.py
           
+
+          ## install jq
+          apt-get update && apt-get install -y jq
+
+          ## Convert json to .env
+          chmod 777 json_to_env.sh
+          ./json_to_env.sh
+
+          ## for Backup
+          touch /backup.sh
+          cp ./backup.sh /backup.sh
+
+          chmod 777 backup_setup.sh
+          ./backup_setup.sh
+
           # Build and run Docker containers
-          docker-compose build
-          docker-compose up -d
+          docker compose build
+          docker compose up -d
