@@ -46,6 +46,7 @@ jobs:
           echo '${{ secrets.FIREBASE_ADMIN_SDK }}' > my_middle_API/secrets/secret_fir-locator-35839-firebase-adminsdk-yb6f6-a5b81519d9.json
           echo '${{ secrets.SECRETS_GMAP }}' > my_middle_API/secrets/secrets_gmap.json
           echo '${{ secrets.SECRETS_FIREBASE }}' > my_middle_API/secrets/secrets_firebase.json
+          echo '${{ secrets.SECRET_DATABASE_ENV }}' > storage/secrets/secrets_database.env
           echo '${{ secrets.FRONTEND_ENV }}' > FrontEnd/.env
 
           # Replace values in files
@@ -57,10 +58,6 @@ jobs:
 
           ## install jq
           apt-get update && apt-get install -y jq
-
-          ## Convert json to .env
-          chmod 777 json_to_env.sh
-          ./json_to_env.sh
 
           ## for Backup
           touch /backup.sh
