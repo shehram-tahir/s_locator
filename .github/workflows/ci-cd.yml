@@ -38,7 +38,7 @@ jobs:
           echo "Docker compose down completed."
           
           cd ..
-          rm -rf s_locator
+          rm -rf s_locator #TODO this will delete the data in the database
           echo "Removed existing s_locator directory."
           
           # Clone the repository and update submodules
