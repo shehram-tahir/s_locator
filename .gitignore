@@ -2,6 +2,7 @@
 **/__pycache__
 **/secret*
 **/venv
+**/.venv
 pc_venv/
 **/.idea/
 **/.env
