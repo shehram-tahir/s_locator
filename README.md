@@ -20,9 +20,6 @@ s_locator/
 │   └── src/
 │       ├── index.html
 │       └── index.js
-├── Nginx/
-│   ├── Dockerfile
-│   └── nginx.conf
 └── my_middle_API/
     ├── Dockerfile
     ├── common_settings.json
@@ -80,23 +77,19 @@ Located in the `my_middle_API` directory, this component acts as the middle laye
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
+step 1 clone s-locator and subrepos
 
-### Installation
+git clone --recursive https://github.com/abdullahalhoothy/s_locator.git && cd s_locator && git submodule update --remote --recursive && git submodule foreach 'git checkout main && git pull'
 
-1. Clone the repository:
+step 2 you are missing secrets
+frontend: s_locator\FrontEnd\.env
+storage: s_locator\storage\secrets\secrets_database.env"
+backend2:
+-"G:\My Drive\Personal\Work\offline\Jupyter\Git\20241104s_locator\my_middle_API\secrets\secrets_gmap.json"
+-"G:\My Drive\Personal\Work\offline\Jupyter\Git\20241104s_locator\my_middle_API\secrets\secrets_firebase.json"
+-"G:\My Drive\Personal\Work\offline\Jupyter\Git\20241104s_locator\my_middle_API\secrets\secret_fir-locator-35839-firebase-adminsdk-yb6f6-a5b81519d9.json"
 
-```bash
-git clone https://github.com/abdullahalhoothy/s_locator.git
-cd s_locator
-```
-
-2. Build and run the Docker containers:
-
-```bash
-docker-compose up --build
-```
+step 3 run build docker compose in s-locator
 
 ## Usage
 
