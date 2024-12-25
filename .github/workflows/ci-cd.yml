@@ -35,18 +35,20 @@ jobs:
           set -x  # Enable debug mode
           
           echo "Starting deployment process..."
+          # Set folder name based on host
+          FOLDER_NAME="${{ matrix.host == 'vps1' && 's_locator' || 's_locator_dev' }}"
           
-          cd s_locator
+          cd $FOLDER_NAME
           docker compose down
           echo "Docker compose down completed."
           
           cd ..
-          rm -rf s_locator
-          echo "Removed existing s_locator directory."
+          rm -rf $FOLDER_NAME
+          echo "Removed existing $FOLDER_NAME directory."
           
           # Clone the repository and update submodules
           git clone --recursive https://github.com/abdullahalhoothy/s_locator.git &&
-          cd s_locator &&
+          cd $FOLDER_NAME &&
           git submodule update --remote --recursive --merge &&
           git submodule foreach 'git checkout main && git pull origin main'
           echo "Repository cloned and submodules updated."
@@ -67,13 +69,13 @@ jobs:
           
           # Replace values in files
           # Update configuration based on VPS
-          # if [ "${{ matrix.host }}" = "vps1" ]; then
-          sed -i 's|"REACT_APP_API_URL": "http://localhost:8000/fastapi"|"REACT_APP_API_URL": "http://s-locator.northernacs.com:8000/fastapi"|g' FrontEnd/src/urls.json
-          sed -i 's|enable_CORS_url: str = "http://localhost:3000"|enable_CORS_url: str = "http://s-locator.northernacs.com"|g' my_middle_API/config_factory.py
-          # else
-          #   sed -i 's|"REACT_APP_API_URL": "http://localhost:8000/fastapi"|"REACT_APP_API_URL": "http://37.27.195.216:8000/fastapi"|g' FrontEnd/src/urls.json
-          #   sed -i 's|enable_CORS_url: str = "http://localhost:3000"|enable_CORS_url: str = "http://37.27.195.216:3000"|g' my_middle_API/config_factory.py
-          # fi
+          if [ "${{ matrix.host }}" = "vps1" ]; then
+            sed -i 's|"REACT_APP_API_URL": "http://localhost:8000/fastapi"|"REACT_APP_API_URL": "http://s-locator.northernacs.com:8000/fastapi"|g' FrontEnd/src/urls.json
+            sed -i 's|enable_CORS_url: str = "http://localhost:3000"|enable_CORS_url: str = "http://s-locator.northernacs.com"|g' my_middle_API/config_factory.py
+          else
+            sed -i 's|"REACT_APP_API_URL": "http://localhost:8000/fastapi"|"REACT_APP_API_URL": "http://37.27.195.216:8000/fastapi"|g' FrontEnd/src/urls.json
+            sed -i 's|enable_CORS_url: str = "http://localhost:3000"|enable_CORS_url: str = "http://37.27.195.216:3000"|g' my_middle_API/config_factory.py
+          fi
           
           sed -i 's|uvicorn.run(app, host="localhost", port=8000)|uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)|g' my_middle_API/run_apps.py
           sed -i 's|dsn: str = "postgresql://scraper_user:scraper_password@s-locator.northernacs.com:5432/aqar_scraper"|dsn: str = "postgresql://scraper_user:scraper_password@db:5432/aqar_scraper"|g' my_middle_API/database.py
