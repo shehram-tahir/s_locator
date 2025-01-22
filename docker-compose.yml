@@ -16,6 +16,7 @@ services:
       - storage/secrets/secrets_database.env
     ports:
       - "8000:8000"
+      - "7000:7000"
     networks:
       - myinternalnetwork
     depends_on:
