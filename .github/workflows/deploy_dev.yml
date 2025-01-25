@@ -35,6 +35,9 @@ jobs:
           set -e  # Exit on error
           
           echo "Starting deployment process..."
+
+          pwd
+          echo "Current location: $(pwd)"
           
           cd s_locator
           docker compose down
