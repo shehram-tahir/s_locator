@@ -43,6 +43,8 @@ jobs:
           echo "Removed existing s_locator directory."
           
           # Clone the repository and update submodules
+          git config --global user.email "ci@example.com"
+          git config --global user.name "Github actions"
           git clone --recursive https://github.com/abdullahalhoothy/s_locator.git &&
           cd s_locator &&
           git submodule update --remote --recursive --merge &&
