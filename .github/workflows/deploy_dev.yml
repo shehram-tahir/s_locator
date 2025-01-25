@@ -36,8 +36,8 @@ jobs:
           
           echo "Starting deployment process..."
 
-          pwd
-          echo "Current location: $(pwd)"
+          echo "Current directory contents:"
+          ls
           
           cd s_locator
           docker compose down
