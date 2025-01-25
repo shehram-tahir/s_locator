@@ -36,8 +36,11 @@ jobs:
           
           echo "Starting deployment process..."
 
-          echo "Current directory contents:"
-          ls
+          cd ..
+          cd ..
+          cd ..
+          cd ..
+          cd ..
           
           cd s_locator
           docker compose down
