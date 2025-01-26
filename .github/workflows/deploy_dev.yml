@@ -41,14 +41,15 @@ jobs:
           cd ..
           cd ..
           cd ..
-          
-          cd s_locator
-          docker compose down
-          echo "Docker compose down completed."
-          
-          cd ..
-          rm -rf s_locator
-          echo "Removed existing s_locator directory."
+          if [ -d "s_locator" ]; then
+            cd s_locator
+            docker compose down
+            echo "Docker compose down completed."
+            
+            cd ..
+            rm -rf s_locator
+            echo "Removed existing s_locator directory."
+          fi
           
           # Clone the repository and update submodules
           git config --global user.email "ci@example.com"
