@@ -56,7 +56,7 @@ jobs:
           git config --global user.name "Github actions"
           git clone --recursive https://github.com/abdullahalhoothy/s_locator.git &&
           cd s_locator &&
-          git submodule update --remote --recursive --merge &&
+          git submodule update --remote --recursive &&
           git submodule foreach 'git checkout dev && git pull origin dev'
           echo "Repository cloned and submodules updated."
           
