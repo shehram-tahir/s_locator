@@ -6,7 +6,7 @@
 pc_venv/
 **/.idea/
 **/.env
-**/secret*
+**/dev-secret*
 husain_videos/**
 mykeys*
 ssh_config
