@@ -1,5 +1,5 @@
 name: Deploy main
-
+on:
   workflow_dispatch:
     inputs:
       reason:
