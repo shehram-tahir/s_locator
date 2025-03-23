@@ -1,6 +1,9 @@
 name: Deploy Dev
 
 on:
+  pull_request:
+    branches:
+      - main          # Runs only for pull requests targeting the 'main' branch
   push:
     branches: [ dev ]
   workflow_dispatch:
