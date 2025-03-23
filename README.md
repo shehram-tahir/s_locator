@@ -1,5 +1,4 @@
 
-
 # s_locator
 
 s_locator is a project designed to provide a seamless integration of frontend, backend, and middle API components using Docker containers. The project uses various technologies to ensure efficient data management and API interaction.
